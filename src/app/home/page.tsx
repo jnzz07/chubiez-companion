@@ -13,6 +13,17 @@ async function signOut() {
 }
 
 export default async function HomePage() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return (
+      <main className="min-h-screen bg-[#1E1B2E] flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-2xl font-bold text-[#FFF8F0] mb-2">chubiez.</p>
+          <p className="text-[#8B84A8] text-sm">Add your environment variables in Railway to activate the app.</p>
+        </div>
+      </main>
+    )
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

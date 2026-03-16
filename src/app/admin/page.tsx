@@ -7,6 +7,18 @@ import { CodesTable } from '@/components/admin/CodesTable'
 export const metadata = { title: 'admin — chubiez' }
 
 export default async function AdminPage() {
+  // Show setup screen if env vars not configured yet
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return (
+      <main className="min-h-screen bg-[#FFF8F0] flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <p className="text-2xl font-bold text-[#1E1B2E] mb-2">chubiez. admin</p>
+          <p className="text-[#8B84A8] text-sm">Add your environment variables in Railway to activate this panel.</p>
+        </div>
+      </main>
+    )
+  }
+
   // Auth check
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
