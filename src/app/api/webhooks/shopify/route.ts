@@ -5,7 +5,7 @@ import { variantToPlushSlug } from '@/lib/plushTypes'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_ADDRESS } from '@/lib/email/resend'
 import { AccessCodeEmail } from '@/lib/email/templates/accessCode'
-import { render } from '@react-email/components'
+import { render } from '@react-email/render'
 
 interface ShopifyLineItem {
   variant_id: number

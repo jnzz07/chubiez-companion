@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { generateAccessCode, getExpiryDate } from '@/lib/codes/generate'
 import { resend, FROM_ADDRESS } from '@/lib/email/resend'
 import { AccessCodeEmail } from '@/lib/email/templates/accessCode'
-import { render } from '@react-email/components'
+import { render } from '@react-email/render'
 import { createClient } from '@/lib/supabase/server'
 
 const schema = z.object({
