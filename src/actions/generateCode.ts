@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generateAccessCode, getExpiryDate } from '@/lib/codes/generate'
-import { resend, FROM_ADDRESS } from '@/lib/email/resend'
+import { getResend, FROM_ADDRESS } from '@/lib/email/resend'
 import { AccessCodeEmail } from '@/lib/email/templates/accessCode'
 import { render } from '@react-email/render'
 import { createClient } from '@/lib/supabase/server'
@@ -65,7 +65,7 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
       AccessCodeEmail({ email, code, plushName, appUrl, expiresAt })
     )
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_ADDRESS,
       to: email,
       subject: `your ${plushName} is ready 🤍`,
@@ -141,7 +141,7 @@ export async function resendCodeAction(codeId: string): Promise<GenerateResult> 
     })
   )
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM_ADDRESS,
     to: record.email,
     subject: `your ${plushName} is ready 🤍`,

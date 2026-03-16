@@ -5,7 +5,7 @@ import { verifyShopifyWebhook } from '@/lib/shopify/verifyWebhook'
 import { generateAccessCode, getExpiryDate } from '@/lib/codes/generate'
 import { variantToPlushSlug } from '@/lib/plushTypes'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resend, FROM_ADDRESS } from '@/lib/email/resend'
+import { getResend, FROM_ADDRESS } from '@/lib/email/resend'
 import { AccessCodeEmail } from '@/lib/email/templates/accessCode'
 import { render } from '@react-email/render'
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         AccessCodeEmail({ email, code, plushName, appUrl, expiresAt })
       )
 
-      const { error: emailError } = await resend.emails.send({
+      const { error: emailError } = await getResend().emails.send({
         from: FROM_ADDRESS,
         to: email,
         subject: `your ${plushName} is ready 🤍`,
