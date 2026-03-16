@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 import { verifyShopifyWebhook } from '@/lib/shopify/verifyWebhook'
 import { generateAccessCode, getExpiryDate } from '@/lib/codes/generate'
 import { variantToPlushSlug } from '@/lib/plushTypes'
