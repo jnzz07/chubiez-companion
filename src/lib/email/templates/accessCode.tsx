@@ -1,6 +1,5 @@
 import {
   Body,
-  Button,
   Container,
   Head,
   Heading,
@@ -12,9 +11,7 @@ import {
 } from '@react-email/components'
 
 interface AccessCodeEmailProps {
-  email: string
   code: string
-  appUrl: string
   expiryStr: string
   /* Team-editable copy — placeholders already filled by sendAccessCodeEmail */
   heading: string
@@ -23,16 +20,12 @@ interface AccessCodeEmailProps {
 }
 
 export function AccessCodeEmail({
-  email,
   code,
-  appUrl,
   expiryStr,
   heading,
   intro,
   footer,
 }: AccessCodeEmailProps) {
-  const loginUrl = `${appUrl}/enter?email=${encodeURIComponent(email)}&code=${code}`
-
   return (
     <Html>
       <Head />
@@ -60,10 +53,7 @@ export function AccessCodeEmail({
 
           {/* CTA */}
           <Section style={ctaSection}>
-            <Button style={button} href={loginUrl}>
-              enter the app →
-            </Button>
-            <Text style={ctaOr}>or go to bemellou.com/enter and type it in</Text>
+            <Text style={ctaOr}>type this code into the bemellou app to unlock it</Text>
           </Section>
 
           <Hr style={divider} />

@@ -19,7 +19,6 @@ export async function sendAccessCodeEmail(
   supabase: SupabaseClient,
   { email, code, plushName, expiresAt }: SendArgs
 ): Promise<string | null> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://companion.bemellou.com'
   const template = await getEmailTemplate(supabase)
 
   const expiry = expiresAt.toLocaleDateString('en-US', {
@@ -31,9 +30,7 @@ export async function sendAccessCodeEmail(
 
   const html = await render(
     AccessCodeEmail({
-      email,
       code,
-      appUrl,
       expiryStr: expiry,
       heading: fillPlaceholders(template.heading, vars),
       intro: fillPlaceholders(template.intro, vars),
