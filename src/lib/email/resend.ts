@@ -5,5 +5,6 @@ export function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? 'placeholder')
 }
 
-// support@bemellou.com is the address connected to Shopify — customers can reply to it
-export const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? 'support@bemellou.com'
+// support@bemellou.com is the address connected to Shopify — customers can reply to it.
+// The "bemellou" display name is what shows in the inbox sender column.
+export const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? 'bemellou <support@bemellou.com>'
