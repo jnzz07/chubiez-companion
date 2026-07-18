@@ -38,10 +38,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/enter', request.url))
   }
 
-  // Protect /admin — redirect to /enter if not authenticated
-  if (pathname.startsWith('/admin') && !user) {
-    return NextResponse.redirect(new URL('/enter', request.url))
-  }
+  // /admin is NOT guarded here — it has its own team-password auth (see lib/adminAuth.ts)
 
   // Redirect authenticated users away from /enter
   if (pathname === '/enter' && user) {
