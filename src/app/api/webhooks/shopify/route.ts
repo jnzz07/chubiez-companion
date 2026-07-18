@@ -94,7 +94,14 @@ export async function POST(request: NextRequest) {
       continue
     }
 
-    // 6. Send email
+    // 6. Send email — unless auto-sending is paused (test-trial mode).
+    // Paused orders still get a code claimed + logged; send later via the
+    // panel's resend button, or flip AUTO_EMAILS_ENABLED to true on Railway.
+    if (process.env.AUTO_EMAILS_ENABLED === 'false') {
+      console.log(`[shopify-webhook] AUTO_EMAILS_ENABLED=false — code ${code} logged for ${email} but NOT emailed`)
+      continue
+    }
+
     try {
       const emailError = await sendAccessCodeEmail(supabase, { email, code, plushName, expiresAt })
 
