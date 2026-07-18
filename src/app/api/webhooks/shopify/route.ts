@@ -1,13 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 import { verifyShopifyWebhook } from '@/lib/shopify/verifyWebhook'
-import { generateAccessCode, getExpiryDate } from '@/lib/codes/generate'
+import { getExpiryDate } from '@/lib/codes/generate'
+import { claimPoolCode } from '@/lib/codes/pool'
 import { variantToPlushSlug } from '@/lib/plushTypes'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getResend, FROM_ADDRESS } from '@/lib/email/resend'
-import { AccessCodeEmail } from '@/lib/email/templates/accessCode'
-import { render } from '@react-email/render'
+import { sendAccessCodeEmail } from '@/lib/email/sendAccessCode'
 
 interface ShopifyLineItem {
   variant_id: number
@@ -48,7 +47,6 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createAdminClient()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://companion.chubiez.com'
 
   // Process one code per line item (one plushie = one code)
   for (const item of line_items) {
@@ -66,8 +64,14 @@ export async function POST(request: NextRequest) {
       continue
     }
 
-    // 4. Generate code
-    const code = generateAccessCode()
+    // 4. Claim a pre-made code from the pool (codes come from the Bemellou app —
+    // this service never invents its own). Empty pool → 500 so Shopify retries
+    // over the next 48h, giving time to import a fresh batch.
+    const code = await claimPoolCode(supabase)
+    if (!code) {
+      console.error(`[shopify-webhook] CODE POOL EMPTY — order ${shopifyOrderId} not fulfilled. Import more codes in /admin.`)
+      return NextResponse.json({ error: 'Code pool empty' }, { status: 500 })
+    }
     const expiresAt = getExpiryDate(30)
     const plushSlug = variantToPlushSlug(String(item.variant_id))
     const plushName = item.title
@@ -92,16 +96,7 @@ export async function POST(request: NextRequest) {
 
     // 6. Send email
     try {
-      const html = await render(
-        AccessCodeEmail({ email, code, plushName, appUrl, expiresAt })
-      )
-
-      const { error: emailError } = await getResend().emails.send({
-        from: FROM_ADDRESS,
-        to: email,
-        subject: `your ${plushName} is ready 🤍`,
-        html,
-      })
+      const emailError = await sendAccessCodeEmail(supabase, { email, code, plushName, expiresAt })
 
       if (emailError) {
         console.error(`[shopify-webhook] Email failed for ${email}:`, emailError)

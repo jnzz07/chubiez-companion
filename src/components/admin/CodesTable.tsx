@@ -45,29 +45,29 @@ export function CodesTable({ codes, totalCount }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E8E0D5] overflow-hidden">
+    <div className="bg-white rounded-xl border border-[#E8E0D5] overflow-hidden">
       <div className="px-6 py-4 border-b border-[#E8E0D5] flex items-center justify-between">
-        <h2 className="font-semibold text-[#1E1B2E] text-lg">all codes</h2>
-        <span className="text-sm text-[#8B84A8]">{totalCount} total</span>
+        <h2 className="font-semibold text-[#303030] text-lg">all codes</h2>
+        <span className="text-sm text-[#7a7a7a]">{totalCount} total</span>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#E8E0D5] bg-[#FFF8F0]">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">email</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">code</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">plush</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">status</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">source</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">created</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#8B84A8] uppercase tracking-wider">actions</th>
+            <tr className="border-b border-[#E8E0D5] bg-[#fffcf4]">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">email</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">code</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">plush</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">source</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">created</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F0EBE4]">
             {codes.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-[#8B84A8] py-10 text-sm">
+                <td colSpan={7} className="text-center text-[#7a7a7a] py-10 text-sm">
                   no codes yet. generate one above.
                 </td>
               </tr>
@@ -75,21 +75,21 @@ export function CodesTable({ codes, totalCount }: Props) {
             {codes.map(code => {
               const status = getStatus(code)
               return (
-                <tr key={code.id} className="hover:bg-[#FFF8F0] transition">
-                  <td className="px-4 py-3 text-[#1E1B2E]">{code.email}</td>
+                <tr key={code.id} className="hover:bg-[#fffcf4] transition">
+                  <td className="px-4 py-3 text-[#303030]">{code.email}</td>
                   <td className="px-4 py-3">
-                    <span className="font-mono text-sm tracking-wider bg-[#1E1B2E] text-[#FFF8F0] px-2 py-0.5 rounded-md">
+                    <span className="font-mono text-sm tracking-wider bg-[#303030] text-[#fffcf4] px-2 py-0.5 rounded-md">
                       {code.code}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[#4B4866]">{code.plush_type_slug ?? '—'}</td>
+                  <td className="px-4 py-3 text-[#565656]">{code.plush_type_slug ?? '—'}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${status.color}`}>
+                    <span className={`text-xs font-medium px-2 py-1 rounded-lg ${status.color}`}>
                       {status.label}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[#8B84A8]">{code.generated_by}</td>
-                  <td className="px-4 py-3 text-[#8B84A8]">
+                  <td className="px-4 py-3 text-[#7a7a7a]">{code.generated_by}</td>
+                  <td className="px-4 py-3 text-[#7a7a7a]">
                     {new Date(code.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
@@ -97,7 +97,7 @@ export function CodesTable({ codes, totalCount }: Props) {
                       <button
                         onClick={() => handleResend(code.id)}
                         disabled={isPending && resendingId === code.id}
-                        className="text-xs text-[#C4B5FD] hover:text-[#1E1B2E] transition disabled:opacity-50"
+                        className="text-xs text-[#8ed1fc] hover:text-[#303030] transition disabled:opacity-50"
                       >
                         {resendingId === code.id ? 'sending...' :
                           feedback?.id === code.id ? feedback.msg : 'resend'}

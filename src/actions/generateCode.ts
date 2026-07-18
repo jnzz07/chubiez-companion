@@ -2,11 +2,11 @@
 
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { generateAccessCode, getExpiryDate } from '@/lib/codes/generate'
-import { getResend, FROM_ADDRESS } from '@/lib/email/resend'
-import { AccessCodeEmail } from '@/lib/email/templates/accessCode'
-import { render } from '@react-email/render'
-import { createClient } from '@/lib/supabase/server'
+import { getExpiryDate } from '@/lib/codes/generate'
+import { claimPoolCode, parseCodeSheet } from '@/lib/codes/pool'
+import { sendAccessCodeEmail } from '@/lib/email/sendAccessCode'
+import { saveEmailTemplate, type EmailTemplate } from '@/lib/email/settings'
+import { isAdmin } from '@/lib/adminAuth'
 
 const schema = z.object({
   email: z.string().email(),
@@ -19,16 +19,7 @@ export type GenerateResult =
   | { success: false; error: string }
 
 export async function generateCodeAction(formData: FormData): Promise<GenerateResult> {
-  // Verify admin session
-  const supabaseBrowser = await createClient()
-  const { data: { user } } = await supabaseBrowser.auth.getUser()
-
-  if (!user?.email) return { success: false, error: 'Unauthorized' }
-
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
-  if (!adminEmails.includes(user.email.toLowerCase())) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!(await isAdmin())) return { success: false, error: 'Unauthorized' }
 
   const parsed = schema.safeParse({
     email: formData.get('email'),
@@ -42,9 +33,12 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
 
   const { email, plushSlug, plushName } = parsed.data
   const supabase = createAdminClient()
-  const code = generateAccessCode()
+
+  const code = await claimPoolCode(supabase)
+  if (!code) {
+    return { success: false, error: 'Code pool is empty — import a new batch of codes first.' }
+  }
   const expiresAt = getExpiryDate(30)
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://companion.chubiez.com'
 
   // Insert code
   const { error: insertError } = await supabase.from('access_codes').insert({
@@ -61,21 +55,14 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
 
   // Send email
   try {
-    const html = await render(
-      AccessCodeEmail({ email, code, plushName, appUrl, expiresAt })
-    )
+    const sendError = await sendAccessCodeEmail(supabase, { email, code, plushName, expiresAt })
 
-    await getResend().emails.send({
-      from: FROM_ADDRESS,
-      to: email,
-      subject: `your ${plushName} is ready 🤍`,
-      html,
-    })
-
-    await supabase
-      .from('access_codes')
-      .update({ sent_at: new Date().toISOString() })
-      .eq('code', code)
+    if (!sendError) {
+      await supabase
+        .from('access_codes')
+        .update({ sent_at: new Date().toISOString() })
+        .eq('code', code)
+    }
   } catch (err) {
     console.error('[generateCode] Email send failed:', err)
     // Code was saved — return success even if email failed (admin can resend)
@@ -85,15 +72,7 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
 }
 
 export async function getCodesAction(page = 1, pageSize = 20) {
-  // Verify admin session
-  const supabaseBrowser = await createClient()
-  const { data: { user } } = await supabaseBrowser.auth.getUser()
-  if (!user?.email) return { data: [], count: 0, error: 'Unauthorized' }
-
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
-  if (!adminEmails.includes(user.email.toLowerCase())) {
-    return { data: [], count: 0, error: 'Unauthorized' }
-  }
+  if (!(await isAdmin())) return { data: [], count: 0, error: 'Unauthorized' }
 
   const supabase = createAdminClient()
   const from = (page - 1) * pageSize
@@ -109,15 +88,7 @@ export async function getCodesAction(page = 1, pageSize = 20) {
 }
 
 export async function resendCodeAction(codeId: string): Promise<GenerateResult> {
-  // Verify admin session
-  const supabaseBrowser = await createClient()
-  const { data: { user } } = await supabaseBrowser.auth.getUser()
-  if (!user?.email) return { success: false, error: 'Unauthorized' }
-
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
-  if (!adminEmails.includes(user.email.toLowerCase())) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!(await isAdmin())) return { success: false, error: 'Unauthorized' }
 
   const supabase = createAdminClient()
   const { data: record } = await supabase
@@ -128,25 +99,16 @@ export async function resendCodeAction(codeId: string): Promise<GenerateResult> 
 
   if (!record) return { success: false, error: 'Code not found' }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://companion.chubiez.com'
-  const plushName = (record.plush_types as { name: string } | null)?.name ?? 'Chubiez Plushie'
+  const plushName = (record.plush_types as { name: string } | null)?.name ?? 'Bemellou Plushie'
 
-  const html = await render(
-    AccessCodeEmail({
-      email: record.email,
-      code: record.code,
-      plushName,
-      appUrl,
-      expiresAt: new Date(record.expires_at),
-    })
-  )
-
-  await getResend().emails.send({
-    from: FROM_ADDRESS,
-    to: record.email,
-    subject: `your ${plushName} is ready 🤍`,
-    html,
+  const sendError = await sendAccessCodeEmail(supabase, {
+    email: record.email,
+    code: record.code,
+    plushName,
+    expiresAt: new Date(record.expires_at),
   })
+
+  if (sendError) return { success: false, error: sendError }
 
   await supabase
     .from('access_codes')
@@ -154,4 +116,71 @@ export async function resendCodeAction(codeId: string): Promise<GenerateResult> 
     .eq('id', codeId)
 
   return { success: true, code: record.code, email: record.email }
+}
+
+export type ImportResult =
+  | { success: true; imported: number; skipped: number }
+  | { success: false; error: string }
+
+/** Imports a pasted sheet of codes from the Bemellou app into the pool. */
+export async function importCodesAction(formData: FormData): Promise<ImportResult> {
+  if (!(await isAdmin())) return { success: false, error: 'Unauthorized' }
+
+  const raw = String(formData.get('codes') ?? '')
+  const batch = String(formData.get('batch') ?? '').trim() || null
+  const codes = parseCodeSheet(raw)
+
+  if (codes.length === 0) {
+    return { success: false, error: 'No valid codes found — paste one code per line.' }
+  }
+
+  const supabase = createAdminClient()
+
+  // Upsert with ignoreDuplicates — a code already in the pool is never
+  // re-imported or reset, so an assigned code can't become available again.
+  const { data, error } = await supabase
+    .from('code_pool')
+    .upsert(
+      codes.map(code => ({ code, batch })),
+      { onConflict: 'code', ignoreDuplicates: true }
+    )
+    .select('code')
+
+  if (error) {
+    return { success: false, error: `Import failed: ${error.message}` }
+  }
+
+  const imported = data?.length ?? 0
+  return { success: true, imported, skipped: codes.length - imported }
+}
+
+export type TemplateResult = { success: true } | { success: false; error: string }
+
+const templateSchema = z.object({
+  subject: z.string().min(1, 'Subject is required'),
+  heading: z.string().min(1, 'Heading is required'),
+  intro: z.string().min(1, 'Intro is required'),
+  footer: z.string().min(1, 'Footer is required'),
+})
+
+/** Saves the team-editable access-code email template. */
+export async function saveTemplateAction(formData: FormData): Promise<TemplateResult> {
+  if (!(await isAdmin())) return { success: false, error: 'Unauthorized' }
+
+  const parsed = templateSchema.safeParse({
+    subject: formData.get('subject'),
+    heading: formData.get('heading'),
+    intro: formData.get('intro'),
+    footer: formData.get('footer'),
+  })
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0].message }
+  }
+
+  const supabase = createAdminClient()
+  const error = await saveEmailTemplate(supabase, parsed.data as EmailTemplate)
+
+  if (error) return { success: false, error: `Save failed: ${error}` }
+  return { success: true }
 }

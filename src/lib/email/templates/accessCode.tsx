@@ -14,46 +14,41 @@ import {
 interface AccessCodeEmailProps {
   email: string
   code: string
-  plushName: string
   appUrl: string
-  expiresAt: Date
+  expiryStr: string
+  /* Team-editable copy — placeholders already filled by sendAccessCodeEmail */
+  heading: string
+  intro: string
+  footer: string
 }
 
 export function AccessCodeEmail({
   email,
   code,
-  plushName,
   appUrl,
-  expiresAt,
+  expiryStr,
+  heading,
+  intro,
+  footer,
 }: AccessCodeEmailProps) {
   const loginUrl = `${appUrl}/enter?email=${encodeURIComponent(email)}&code=${code}`
-  const expiryStr = expiresAt.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
 
   return (
     <Html>
       <Head />
-      <Preview>your {plushName} is waiting for you 🤍</Preview>
+      <Preview>{heading}</Preview>
       <Body style={main}>
         <Container style={container}>
 
           {/* Header */}
           <Section style={header}>
-            <Text style={logo}>chubiez.</Text>
+            <Text style={logo}>bemellou.</Text>
           </Section>
 
           {/* Hero */}
           <Section style={heroSection}>
-            <Heading style={h1}>
-              your {plushName} is ready.
-            </Heading>
-            <Text style={subtitle}>
-              use this code to enter the companion app — your little corner
-              of the internet where you and your chubi can exist unbothered.
-            </Text>
+            <Heading style={h1}>{heading}</Heading>
+            <Text style={subtitle}>{intro}</Text>
           </Section>
 
           {/* Code block */}
@@ -68,20 +63,18 @@ export function AccessCodeEmail({
             <Button style={button} href={loginUrl}>
               enter the app →
             </Button>
-            <Text style={ctaOr}>or go to chubiez.com/enter and type it in</Text>
+            <Text style={ctaOr}>or go to bemellou.com/enter and type it in</Text>
           </Section>
 
           <Hr style={divider} />
 
           {/* Footer */}
           <Section>
-            <Text style={footer}>
-              you bought a {plushName}. we think that was a good call.
-              <br />
-              questions? reply to this email or hit us at hello@chubiez.com
-            </Text>
+            {footer.split('\n').map((line, i) => (
+              <Text key={i} style={footerStyle}>{line}</Text>
+            ))}
             <Text style={footerSmall}>
-              chubiez · this code is for you only · please don&apos;t share it
+              bemellou · this code is for you only · please don&apos;t share it
             </Text>
           </Section>
 
@@ -94,8 +87,8 @@ export function AccessCodeEmail({
 // ── Styles ──────────────────────────────────────────────────────────────────
 
 const main = {
-  backgroundColor: '#FFF8F0',
-  fontFamily: "'Syne', 'Inter', sans-serif",
+  backgroundColor: '#fffcf4',
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
 }
 
 const container = {
@@ -110,9 +103,10 @@ const header = {
 }
 
 const logo = {
+  fontFamily: "'Baloo 2', 'Quicksand', sans-serif",
   fontSize: '28px',
   fontWeight: '700',
-  color: '#1E1B2E',
+  color: '#303030',
   letterSpacing: '-0.5px',
   margin: '0',
 }
@@ -123,9 +117,10 @@ const heroSection = {
 }
 
 const h1 = {
+  fontFamily: "'Baloo 2', 'Quicksand', sans-serif",
   fontSize: '28px',
   fontWeight: '700',
-  color: '#1E1B2E',
+  color: '#303030',
   margin: '0 0 12px',
   letterSpacing: '-0.5px',
   lineHeight: '1.2',
@@ -133,13 +128,13 @@ const h1 = {
 
 const subtitle = {
   fontSize: '16px',
-  color: '#4B4866',
+  color: '#565656',
   lineHeight: '1.6',
   margin: '0',
 }
 
 const codeSection = {
-  backgroundColor: '#1E1B2E',
+  backgroundColor: '#303030',
   borderRadius: '16px',
   padding: '32px',
   textAlign: 'center' as const,
@@ -149,7 +144,7 @@ const codeSection = {
 const codeLabel = {
   fontSize: '12px',
   fontWeight: '600',
-  color: '#C4B5FD',
+  color: '#8ed1fc',
   letterSpacing: '2px',
   textTransform: 'uppercase' as const,
   margin: '0 0 12px',
@@ -158,7 +153,7 @@ const codeLabel = {
 const codeBlock = {
   fontSize: '42px',
   fontWeight: '700',
-  color: '#FFF8F0',
+  color: '#fffcf4',
   letterSpacing: '8px',
   fontFamily: "'Courier New', monospace",
   margin: '0 0 12px',
@@ -166,7 +161,7 @@ const codeBlock = {
 
 const codeHint = {
   fontSize: '13px',
-  color: '#8B84A8',
+  color: '#7a7a7a',
   margin: '0',
 }
 
@@ -176,12 +171,12 @@ const ctaSection = {
 }
 
 const button = {
-  backgroundColor: '#FB7185',
+  backgroundColor: '#0d7f6e',
   color: '#ffffff',
   fontSize: '16px',
   fontWeight: '600',
   padding: '14px 32px',
-  borderRadius: '999px',
+  borderRadius: '8px',
   textDecoration: 'none',
   display: 'inline-block',
   marginBottom: '16px',
@@ -189,7 +184,7 @@ const button = {
 
 const ctaOr = {
   fontSize: '13px',
-  color: '#8B84A8',
+  color: '#7a7a7a',
   margin: '0',
 }
 
@@ -198,9 +193,9 @@ const divider = {
   margin: '0 0 24px',
 }
 
-const footer = {
+const footerStyle = {
   fontSize: '14px',
-  color: '#4B4866',
+  color: '#565656',
   lineHeight: '1.6',
   textAlign: 'center' as const,
   margin: '0 0 12px',
@@ -208,7 +203,7 @@ const footer = {
 
 const footerSmall = {
   fontSize: '12px',
-  color: '#8B84A8',
+  color: '#7a7a7a',
   textAlign: 'center' as const,
   margin: '0',
 }
