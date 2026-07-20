@@ -4,7 +4,6 @@ import {
   Font,
   Head,
   Heading,
-  Hr,
   Html,
   Img,
   Preview,
@@ -126,7 +125,13 @@ export function AccessCodeEmail({
             <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
-          <Hr style={divider} />
+          {/* Plain styled bar instead of a semantic <hr> — mail clients
+              (Gmail especially) use a bare <hr> as a strong signal for
+              'start of quoted/forwarded content' and will auto-collapse
+              everything around it behind a '...' toggle. */}
+          <Section style={dividerWrap}>
+            <div style={dividerBar} />
+          </Section>
 
           {/* Footer */}
           <Section>
@@ -259,10 +264,14 @@ const quote = {
   wordWrap: 'break-word' as const,
 }
 
-const divider = {
-  borderColor: '#303030',
-  opacity: 0.12,
+const dividerWrap = {
   margin: '0 0 24px',
+}
+
+const dividerBar = {
+  height: '1px',
+  width: '100%',
+  backgroundColor: 'rgba(48, 48, 48, 0.12)',
 }
 
 const footerStyle = {
