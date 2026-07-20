@@ -1,6 +1,7 @@
 import {
   Body,
   Container,
+  Font,
   Head,
   Heading,
   Hr,
@@ -28,12 +29,43 @@ export function AccessCodeEmail({
 }: AccessCodeEmailProps) {
   return (
     <Html>
-      <Head />
+      <Head>
+        <Font
+          fontFamily="Baloo 2"
+          fallbackFontFamily="Verdana"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/baloo2/v20/wXKvE3UZus5Cb9Ee-EnPqfN0bQ.woff2',
+            format: 'woff2',
+          }}
+          fontWeight={700}
+          fontStyle="normal"
+        />
+        <Font
+          fontFamily="Quicksand"
+          fallbackFontFamily="Verdana"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/quicksand/v31/6xK-dSZaM9iE8KbpRA_hK1QNYuDyPw.woff2',
+            format: 'woff2',
+          }}
+          fontWeight={500}
+          fontStyle="normal"
+        />
+        <Font
+          fontFamily="Gloria Hallelujah"
+          fallbackFontFamily="cursive"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/gloriahallelujah/v22/LYjYdHv5lFcTPTBCFhCbCEnAxg3nSpMDrBw.woff2',
+            format: 'woff2',
+          }}
+          fontWeight={400}
+          fontStyle="normal"
+        />
+      </Head>
       <Preview>{heading}</Preview>
       <Body style={main}>
         <Container style={container}>
 
-          {/* Header */}
+          {/* Header — icon + wordmark lockup, sky blue on soft cream */}
           <Section style={header}>
             <Text style={logo}>bemellou.</Text>
           </Section>
@@ -44,7 +76,7 @@ export function AccessCodeEmail({
             <Text style={subtitle}>{intro}</Text>
           </Section>
 
-          {/* Code block */}
+          {/* Code block — charcoal surface, sky blue label, cream code */}
           <Section style={codeSection}>
             <Text style={codeLabel}>your access code</Text>
             <Text style={codeBlock}>{code}</Text>
@@ -54,6 +86,11 @@ export function AccessCodeEmail({
           {/* CTA */}
           <Section style={ctaSection}>
             <Text style={ctaOr}>type this code into the bemellou app to unlock it</Text>
+          </Section>
+
+          {/* Brand promise, Gloria Hallelujah accent per typography rules */}
+          <Section style={quoteSection}>
+            <Text style={quote}>&ldquo;we don&apos;t fix you. we&apos;re just here for you.&rdquo;</Text>
           </Section>
 
           <Hr style={divider} />
@@ -74,11 +111,15 @@ export function AccessCodeEmail({
   )
 }
 
-// ── Styles ──────────────────────────────────────────────────────────────────
+// ── Styles — Bemellou Brand Book palette ────────────────────────────────────
+// Soft Cream #fffcf4 (background, never pure white) · Charcoal #303030 (text,
+// never pure black) · Sky Blue #8ed1fc (primary/highlights) · Rich Teal
+// #0d7f6e (CTA only). Baloo 2 for headlines, Quicksand for body,
+// Gloria Hallelujah for the one brand-promise accent line — max 2 lines.
 
 const main = {
   backgroundColor: '#fffcf4',
-  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
+  fontFamily: "'Quicksand', Verdana, sans-serif",
 }
 
 const container = {
@@ -93,10 +134,10 @@ const header = {
 }
 
 const logo = {
-  fontFamily: "'Baloo 2', 'Quicksand', sans-serif",
+  fontFamily: "'Baloo 2', Verdana, sans-serif",
   fontSize: '28px',
   fontWeight: '700',
-  color: '#303030',
+  color: '#8ed1fc',
   letterSpacing: '-0.5px',
   margin: '0',
 }
@@ -107,7 +148,7 @@ const heroSection = {
 }
 
 const h1 = {
-  fontFamily: "'Baloo 2', 'Quicksand', sans-serif",
+  fontFamily: "'Baloo 2', Verdana, sans-serif",
   fontSize: '28px',
   fontWeight: '700',
   color: '#303030',
@@ -118,7 +159,8 @@ const h1 = {
 
 const subtitle = {
   fontSize: '16px',
-  color: '#565656',
+  color: '#303030',
+  opacity: 0.75,
   lineHeight: '1.6',
   margin: '0',
 }
@@ -132,6 +174,7 @@ const codeSection = {
 }
 
 const codeLabel = {
+  fontFamily: "'Quicksand', Verdana, sans-serif",
   fontSize: '12px',
   fontWeight: '600',
   color: '#8ed1fc',
@@ -151,41 +194,47 @@ const codeBlock = {
 
 const codeHint = {
   fontSize: '13px',
-  color: '#7a7a7a',
+  color: '#fffcf4',
+  opacity: 0.6,
   margin: '0',
 }
 
 const ctaSection = {
   textAlign: 'center' as const,
-  marginBottom: '32px',
-}
-
-const button = {
-  backgroundColor: '#0d7f6e',
-  color: '#ffffff',
-  fontSize: '16px',
-  fontWeight: '600',
-  padding: '14px 32px',
-  borderRadius: '8px',
-  textDecoration: 'none',
-  display: 'inline-block',
-  marginBottom: '16px',
+  marginBottom: '24px',
 }
 
 const ctaOr = {
-  fontSize: '13px',
-  color: '#7a7a7a',
+  fontSize: '14px',
+  color: '#303030',
+  opacity: 0.75,
+  margin: '0',
+}
+
+const quoteSection = {
+  textAlign: 'center' as const,
+  marginBottom: '32px',
+  padding: '0 24px',
+}
+
+const quote = {
+  fontFamily: "'Gloria Hallelujah', cursive",
+  fontSize: '18px',
+  color: '#0d7f6e',
+  lineHeight: '1.5',
   margin: '0',
 }
 
 const divider = {
-  borderColor: '#E8E0D5',
+  borderColor: '#303030',
+  opacity: 0.12,
   margin: '0 0 24px',
 }
 
 const footerStyle = {
   fontSize: '14px',
-  color: '#565656',
+  color: '#303030',
+  opacity: 0.75,
   lineHeight: '1.6',
   textAlign: 'center' as const,
   margin: '0 0 12px',
@@ -193,7 +242,8 @@ const footerStyle = {
 
 const footerSmall = {
   fontSize: '12px',
-  color: '#7a7a7a',
+  color: '#303030',
+  opacity: 0.5,
   textAlign: 'center' as const,
   margin: '0',
 }
