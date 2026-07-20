@@ -31,9 +31,18 @@ export function AccessCodeEmail({
   return (
     <Html>
       <Head>
+        {/*
+          Most phone mail apps (Gmail app on iOS/Android especially) strip
+          @font-face entirely and always render the fallback — they never
+          download webFont. So the fallback below is what most recipients
+          actually see; it has to look intentional on its own, not just be
+          a generic placeholder. Trebuchet MS is a rounded humanist sans
+          available on both Windows and Apple mail clients and is the
+          closest system-safe match to Quicksand's geometry.
+        */}
         <Font
           fontFamily="Baloo 2"
-          fallbackFontFamily="Verdana"
+          fallbackFontFamily="Trebuchet MS"
           webFont={{
             url: 'https://fonts.gstatic.com/s/baloo2/v23/wXK0E3kTposypRydzVT08TS3JnAmtdj9yqpv.ttf',
             format: 'truetype',
@@ -43,7 +52,7 @@ export function AccessCodeEmail({
         />
         <Font
           fontFamily="Quicksand"
-          fallbackFontFamily="Verdana"
+          fallbackFontFamily="Trebuchet MS"
           webFont={{
             url: 'https://fonts.gstatic.com/s/quicksand/v37/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkM0o18E.ttf',
             format: 'truetype',
@@ -53,7 +62,7 @@ export function AccessCodeEmail({
         />
         <Font
           fontFamily="Quicksand"
-          fallbackFontFamily="Verdana"
+          fallbackFontFamily="Trebuchet MS"
           webFont={{
             url: 'https://fonts.gstatic.com/s/quicksand/v37/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkBgv18E.ttf',
             format: 'truetype',
@@ -61,9 +70,12 @@ export function AccessCodeEmail({
           fontWeight={700}
           fontStyle="normal"
         />
+        {/* Gloria Hallelujah almost never loads on mobile mail apps — its
+            fallback below is styled to still look like an intentional
+            accent (italic serif) rather than a broken generic cursive. */}
         <Font
           fontFamily="Gloria Hallelujah"
-          fallbackFontFamily="cursive"
+          fallbackFontFamily="Georgia"
           webFont={{
             url: 'https://fonts.gstatic.com/s/gloriahallelujah/v24/LYjYdHv3kUk9BMV96EIswT9DIbW-MLSy.ttf',
             format: 'truetype',
@@ -78,6 +90,7 @@ export function AccessCodeEmail({
             .bmo-code { font-size: 30px !important; letter-spacing: 4px !important; }
             .bmo-code-section { padding: 22px 12px !important; }
             .bmo-logo { width: 130px !important; }
+            .bmo-quote { font-size: 15px !important; }
           }
         `}</style>
       </Head>
@@ -110,7 +123,7 @@ export function AccessCodeEmail({
 
           {/* Brand promise, Gloria Hallelujah accent per typography rules */}
           <Section style={quoteSection}>
-            <Text style={quote}>&ldquo;we don&apos;t fix you. we&apos;re just here for you.&rdquo;</Text>
+            <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
           <Hr style={divider} />
@@ -139,7 +152,7 @@ export function AccessCodeEmail({
 
 const main = {
   backgroundColor: '#fffcf4',
-  fontFamily: "'Quicksand', Verdana, sans-serif",
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
 }
 
 const container = {
@@ -166,7 +179,7 @@ const heroSection = {
 }
 
 const h1 = {
-  fontFamily: "'Baloo 2', Verdana, sans-serif",
+  fontFamily: "'Baloo 2', 'Trebuchet MS', sans-serif",
   fontSize: '28px',
   fontWeight: '700',
   color: '#303030',
@@ -192,7 +205,7 @@ const codeSection = {
 }
 
 const codeLabel = {
-  fontFamily: "'Quicksand', Verdana, sans-serif",
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
   fontSize: '12px',
   fontWeight: '600',
   color: '#8ed1fc',
@@ -237,11 +250,13 @@ const quoteSection = {
 }
 
 const quote = {
-  fontFamily: "'Gloria Hallelujah', cursive",
+  fontFamily: "'Gloria Hallelujah', Georgia, serif",
+  fontStyle: 'italic' as const,
   fontSize: '17px',
   color: '#0d7f6e',
-  lineHeight: '1.5',
+  lineHeight: '1.6',
   margin: '0',
+  wordWrap: 'break-word' as const,
 }
 
 const divider = {
