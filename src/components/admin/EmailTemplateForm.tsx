@@ -21,9 +21,8 @@ export function EmailTemplateForm({ template }: { template: EmailTemplate }) {
         <h2 className="font-semibold text-[#303030]">email template</h2>
         <p className="text-xs text-[#7a7a7a] mt-0.5">
           the email customers get with their code. you can use{' '}
-          <code className="bg-[#fde8b8]/60 px-1 rounded">{'{{plush_name}}'}</code>,{' '}
-          <code className="bg-[#fde8b8]/60 px-1 rounded">{'{{code}}'}</code> and{' '}
-          <code className="bg-[#fde8b8]/60 px-1 rounded">{'{{expiry}}'}</code> anywhere.
+          <code className="bg-[#fde8b8]/60 px-1 rounded">{'{{plush_name}}'}</code> and{' '}
+          <code className="bg-[#fde8b8]/60 px-1 rounded">{'{{code}}'}</code> anywhere.
         </p>
       </div>
 

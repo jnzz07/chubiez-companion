@@ -7,10 +7,8 @@ interface AccessCode {
   id: string
   email: string
   code: string
-  plush_type_slug: string | null
   used: boolean
   used_at: string | null
-  expires_at: string
   created_at: string
   sent_at: string | null
   generated_by: string
@@ -24,7 +22,6 @@ interface Props {
 
 function getStatus(code: AccessCode): { label: string; color: string } {
   if (code.used) return { label: 'used', color: 'bg-green-100 text-green-700' }
-  if (new Date(code.expires_at) < new Date()) return { label: 'expired', color: 'bg-gray-100 text-gray-500' }
   if (code.sent_at) return { label: 'sent', color: 'bg-blue-100 text-blue-700' }
   return { label: 'pending', color: 'bg-yellow-100 text-yellow-700' }
 }
@@ -57,7 +54,6 @@ export function CodesTable({ codes, totalCount }: Props) {
             <tr className="border-b border-[#E8E0D5] bg-[#fffcf4]">
               <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">email</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">code</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">plush</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">status</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">source</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider">created</th>
@@ -67,7 +63,7 @@ export function CodesTable({ codes, totalCount }: Props) {
           <tbody className="divide-y divide-[#F0EBE4]">
             {codes.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-[#7a7a7a] py-10 text-sm">
+                <td colSpan={6} className="text-center text-[#7a7a7a] py-10 text-sm">
                   no codes yet. generate one above.
                 </td>
               </tr>
@@ -82,7 +78,6 @@ export function CodesTable({ codes, totalCount }: Props) {
                       {code.code}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[#565656]">{code.plush_type_slug ?? '—'}</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-medium px-2 py-1 rounded-lg ${status.color}`}>
                       {status.label}

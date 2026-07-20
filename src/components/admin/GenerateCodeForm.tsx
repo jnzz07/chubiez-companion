@@ -1,25 +1,13 @@
-﻿'use client'
+'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState } from 'react'
 import { generateCodeAction } from '@/actions/generateCode'
-
-interface PlushType {
-  slug: string
-  name: string
-}
-
-interface Props {
-  plushTypes: PlushType[]
-}
 
 const initialState = { success: false as boolean, error: '', code: '', email: '' }
 
-export function GenerateCodeForm({ plushTypes }: Props) {
+export function GenerateCodeForm() {
   const [state, formAction, isPending] = useActionState(
     async (_prev: typeof initialState, formData: FormData) => {
-      const selectedSlug = formData.get('plushSlug') as string
-      const selectedName = plushTypes.find(p => p.slug === selectedSlug)?.name ?? 'Bemellou Plushie'
-      formData.set('plushName', selectedName)
       const result = await generateCodeAction(formData)
       return { ...initialState, ...result }
     },
@@ -28,7 +16,7 @@ export function GenerateCodeForm({ plushTypes }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-[#E8E0D5] p-6">
-      <h2 className="font-semibold text-[#303030] text-lg mb-4">generate & send code</h2>
+      <h2 className="font-semibold text-[#303030] text-lg mb-4">generate &amp; send code</h2>
 
       <form action={formAction} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
@@ -43,16 +31,13 @@ export function GenerateCodeForm({ plushTypes }: Props) {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#565656]">plush type</label>
-          <select
-            name="plushSlug"
-            required
-            className="rounded-xl border border-[#E8E0D5] px-4 py-2.5 text-[#303030] focus:outline-none focus:ring-2 focus:ring-[#8ed1fc] text-sm bg-white"
-          >
-            {plushTypes.map(p => (
-              <option key={p.slug} value={p.slug}>{p.name}</option>
-            ))}
-          </select>
+          <label className="text-sm font-medium text-[#565656]">plush name (optional)</label>
+          <input
+            name="plushName"
+            type="text"
+            placeholder="your bemellou plushie"
+            className="rounded-xl border border-[#E8E0D5] px-4 py-2.5 text-[#303030] placeholder-[#a8a8a8] focus:outline-none focus:ring-2 focus:ring-[#8ed1fc] text-sm"
+          />
         </div>
 
         {state.error && (

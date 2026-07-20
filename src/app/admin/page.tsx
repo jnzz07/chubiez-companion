@@ -30,25 +30,21 @@ export default async function AdminPage() {
   // Data
   const db = createAdminClient()
 
-  const [plushTypesRes, codesRes, statsRes, pool, template] = await Promise.all([
-    db.from('plush_types').select('slug, name').order('name'),
+  const [codesRes, statsRes, pool, template] = await Promise.all([
     db.from('access_codes').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(20),
-    db.from('access_codes').select('used, expires_at, sent_at'),
+    db.from('access_codes').select('used, sent_at'),
     getPoolStats(db),
     getEmailTemplate(db),
   ])
 
-  const plushTypes = plushTypesRes.data ?? []
   const codes = codesRes.data ?? []
   const totalCount = codesRes.count ?? 0
   const allCodes = statsRes.data ?? []
 
-  const now = new Date()
   const stats = {
     total: allCodes.length,
     used: allCodes.filter(c => c.used).length,
-    pending: allCodes.filter(c => !c.used && new Date(c.expires_at) > now).length,
-    expired: allCodes.filter(c => !c.used && new Date(c.expires_at) <= now).length,
+    unused: allCodes.filter(c => !c.used).length,
   }
 
   return (
@@ -69,13 +65,12 @@ export default async function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'codes left in pool', value: pool.available },
             { label: 'total generated', value: stats.total },
             { label: 'redeemed', value: stats.used },
-            { label: 'pending', value: stats.pending },
-            { label: 'expired unused', value: stats.expired },
+            { label: 'unused', value: stats.unused },
           ].map(stat => (
             <div key={stat.label} className="bg-white rounded-xl border border-[#E8E0D5] px-5 py-4">
               <p className="text-2xl font-bold text-[#303030]">{stat.value}</p>
@@ -95,7 +90,7 @@ export default async function AdminPage() {
         {/* Import + generate + template forms */}
         <div className="mb-8 grid gap-6 lg:grid-cols-3 sm:grid-cols-2 items-start">
           <ImportCodesForm />
-          <GenerateCodeForm plushTypes={plushTypes} />
+          <GenerateCodeForm />
           <EmailTemplateForm template={template} />
         </div>
 

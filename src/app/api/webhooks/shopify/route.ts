@@ -2,7 +2,6 @@
 
 export const dynamic = 'force-dynamic'
 import { verifyShopifyWebhook } from '@/lib/shopify/verifyWebhook'
-import { getExpiryDate } from '@/lib/codes/generate'
 import { claimPoolCode } from '@/lib/codes/pool'
 import { variantToPlushSlug } from '@/lib/plushTypes'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -72,7 +71,6 @@ export async function POST(request: NextRequest) {
       console.error(`[shopify-webhook] CODE POOL EMPTY — order ${shopifyOrderId} not fulfilled. Import more codes in /admin.`)
       return NextResponse.json({ error: 'Code pool empty' }, { status: 500 })
     }
-    const expiresAt = getExpiryDate(30)
     const plushSlug = variantToPlushSlug(String(item.variant_id))
     const plushName = item.title
 
@@ -84,7 +82,6 @@ export async function POST(request: NextRequest) {
         code,
         plush_type_slug: plushSlug,
         shopify_order_id: shopifyOrderId,
-        expires_at: expiresAt.toISOString(),
         generated_by: 'shopify',
       })
 
@@ -103,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const emailError = await sendAccessCodeEmail(supabase, { email, code, plushName, expiresAt })
+      const emailError = await sendAccessCodeEmail(supabase, { email, code, plushName })
 
       if (emailError) {
         console.error(`[shopify-webhook] Email failed for ${email}:`, emailError)

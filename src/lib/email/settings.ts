@@ -5,7 +5,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
  * Placeholders available in every field:
  *   {{plush_name}} — the plushie's name
  *   {{code}}       — the access code
- *   {{expiry}}     — human-readable expiry date
  */
 export interface EmailTemplate {
   subject: string
@@ -20,7 +19,7 @@ export const DEFAULT_TEMPLATE: EmailTemplate = {
   intro:
     'use this code to enter the companion app — your little corner of the internet where you and your chubi can exist unbothered.',
   footer:
-    'you bought a {{plush_name}}. we think that was a good call.\nquestions? reply to this email or hit us at support@bemellou.com',
+    'you bought a {{plush_name}}. we think that was a good call.\nquestions? reply to this email or hit us at support@bemellou.com\nthis code never expires — no rush.',
 }
 
 const SETTINGS_KEY = 'access_code_email'
@@ -47,10 +46,9 @@ export async function saveEmailTemplate(
 
 export function fillPlaceholders(
   text: string,
-  vars: { plushName: string; code: string; expiry: string }
+  vars: { plushName: string; code: string }
 ): string {
   return text
     .replaceAll('{{plush_name}}', vars.plushName)
     .replaceAll('{{code}}', vars.code)
-    .replaceAll('{{expiry}}', vars.expiry)
 }

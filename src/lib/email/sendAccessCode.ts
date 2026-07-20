@@ -8,7 +8,6 @@ interface SendArgs {
   email: string
   code: string
   plushName: string
-  expiresAt: Date
 }
 
 /**
@@ -17,21 +16,16 @@ interface SendArgs {
  */
 export async function sendAccessCodeEmail(
   supabase: SupabaseClient,
-  { email, code, plushName, expiresAt }: SendArgs
+  { email, code, plushName }: SendArgs
 ): Promise<string | null> {
   const template = await getEmailTemplate(supabase)
-
-  const expiry = expiresAt.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-  const vars = { plushName, code, expiry }
+  const vars = { plushName, code }
+  const logoUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://bemellou-companion-production.up.railway.app'}/brand/wordmark-sky.png`
 
   const html = await render(
     AccessCodeEmail({
       code,
-      expiryStr: expiry,
+      logoUrl,
       heading: fillPlaceholders(template.heading, vars),
       intro: fillPlaceholders(template.intro, vars),
       footer: fillPlaceholders(template.footer, vars),

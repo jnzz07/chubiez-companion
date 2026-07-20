@@ -6,6 +6,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Preview,
   Section,
   Text,
@@ -13,7 +14,7 @@ import {
 
 interface AccessCodeEmailProps {
   code: string
-  expiryStr: string
+  logoUrl: string
   /* Team-editable copy — placeholders already filled by sendAccessCodeEmail */
   heading: string
   intro: string
@@ -22,7 +23,7 @@ interface AccessCodeEmailProps {
 
 export function AccessCodeEmail({
   code,
-  expiryStr,
+  logoUrl,
   heading,
   intro,
   footer,
@@ -34,8 +35,8 @@ export function AccessCodeEmail({
           fontFamily="Baloo 2"
           fallbackFontFamily="Verdana"
           webFont={{
-            url: 'https://fonts.gstatic.com/s/baloo2/v20/wXKvE3UZus5Cb9Ee-EnPqfN0bQ.woff2',
-            format: 'woff2',
+            url: 'https://fonts.gstatic.com/s/baloo2/v23/wXK0E3kTposypRydzVT08TS3JnAmtdj9yqpv.ttf',
+            format: 'truetype',
           }}
           fontWeight={700}
           fontStyle="normal"
@@ -44,43 +45,62 @@ export function AccessCodeEmail({
           fontFamily="Quicksand"
           fallbackFontFamily="Verdana"
           webFont={{
-            url: 'https://fonts.gstatic.com/s/quicksand/v31/6xK-dSZaM9iE8KbpRA_hK1QNYuDyPw.woff2',
-            format: 'woff2',
+            url: 'https://fonts.gstatic.com/s/quicksand/v37/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkM0o18E.ttf',
+            format: 'truetype',
           }}
           fontWeight={500}
+          fontStyle="normal"
+        />
+        <Font
+          fontFamily="Quicksand"
+          fallbackFontFamily="Verdana"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/quicksand/v37/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkBgv18E.ttf',
+            format: 'truetype',
+          }}
+          fontWeight={700}
           fontStyle="normal"
         />
         <Font
           fontFamily="Gloria Hallelujah"
           fallbackFontFamily="cursive"
           webFont={{
-            url: 'https://fonts.gstatic.com/s/gloriahallelujah/v22/LYjYdHv5lFcTPTBCFhCbCEnAxg3nSpMDrBw.woff2',
-            format: 'woff2',
+            url: 'https://fonts.gstatic.com/s/gloriahallelujah/v24/LYjYdHv3kUk9BMV96EIswT9DIbW-MLSy.ttf',
+            format: 'truetype',
           }}
           fontWeight={400}
           fontStyle="normal"
         />
+        <style>{`
+          @media only screen and (max-width: 480px) {
+            .bmo-container { padding: 28px 16px !important; }
+            .bmo-h1 { font-size: 22px !important; }
+            .bmo-code { font-size: 30px !important; letter-spacing: 4px !important; }
+            .bmo-code-section { padding: 22px 12px !important; }
+            .bmo-logo { width: 130px !important; }
+          }
+        `}</style>
       </Head>
       <Preview>{heading}</Preview>
       <Body style={main}>
-        <Container style={container}>
+        <Container style={container} className="bmo-container">
 
-          {/* Header — icon + wordmark lockup, sky blue on soft cream */}
+          {/* Header — real Sky Blue wordmark on Soft Cream, per wordmark rule */}
           <Section style={header}>
-            <Text style={logo}>bemellou.</Text>
+            <Img src={logoUrl} width="160" alt="bemellou" style={logo} className="bmo-logo" />
           </Section>
 
           {/* Hero */}
           <Section style={heroSection}>
-            <Heading style={h1}>{heading}</Heading>
+            <Heading style={h1} className="bmo-h1">{heading}</Heading>
             <Text style={subtitle}>{intro}</Text>
           </Section>
 
           {/* Code block — charcoal surface, sky blue label, cream code */}
-          <Section style={codeSection}>
+          <Section style={codeSection} className="bmo-code-section">
             <Text style={codeLabel}>your access code</Text>
-            <Text style={codeBlock}>{code}</Text>
-            <Text style={codeHint}>one-time use · expires {expiryStr}</Text>
+            <Text style={codeBlock} className="bmo-code">{code}</Text>
+            <Text style={codeHint}>one-time use · never expires</Text>
           </Section>
 
           {/* CTA */}
@@ -126,20 +146,18 @@ const container = {
   margin: '0 auto',
   padding: '40px 20px',
   maxWidth: '520px',
+  width: '100%',
 }
 
 const header = {
   textAlign: 'center' as const,
-  marginBottom: '32px',
+  marginBottom: '28px',
 }
 
 const logo = {
-  fontFamily: "'Baloo 2', Verdana, sans-serif",
-  fontSize: '28px',
-  fontWeight: '700',
-  color: '#8ed1fc',
-  letterSpacing: '-0.5px',
-  margin: '0',
+  margin: '0 auto',
+  height: 'auto',
+  maxWidth: '100%',
 }
 
 const heroSection = {
@@ -154,7 +172,7 @@ const h1 = {
   color: '#303030',
   margin: '0 0 12px',
   letterSpacing: '-0.5px',
-  lineHeight: '1.2',
+  lineHeight: '1.25',
 }
 
 const subtitle = {
@@ -168,7 +186,7 @@ const subtitle = {
 const codeSection = {
   backgroundColor: '#303030',
   borderRadius: '16px',
-  padding: '32px',
+  padding: '32px 16px',
   textAlign: 'center' as const,
   marginBottom: '32px',
 }
@@ -184,12 +202,13 @@ const codeLabel = {
 }
 
 const codeBlock = {
-  fontSize: '42px',
+  fontSize: '38px',
   fontWeight: '700',
   color: '#fffcf4',
-  letterSpacing: '8px',
+  letterSpacing: '6px',
   fontFamily: "'Courier New', monospace",
   margin: '0 0 12px',
+  wordBreak: 'break-all' as const,
 }
 
 const codeHint = {
@@ -214,12 +233,12 @@ const ctaOr = {
 const quoteSection = {
   textAlign: 'center' as const,
   marginBottom: '32px',
-  padding: '0 24px',
+  padding: '0 16px',
 }
 
 const quote = {
   fontFamily: "'Gloria Hallelujah', cursive",
-  fontSize: '18px',
+  fontSize: '17px',
   color: '#0d7f6e',
   lineHeight: '1.5',
   margin: '0',

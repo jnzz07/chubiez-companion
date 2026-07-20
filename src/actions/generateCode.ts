@@ -2,7 +2,6 @@
 
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getExpiryDate } from '@/lib/codes/generate'
 import { claimPoolCode, parseCodeSheet } from '@/lib/codes/pool'
 import { sendAccessCodeEmail } from '@/lib/email/sendAccessCode'
 import { saveEmailTemplate, type EmailTemplate } from '@/lib/email/settings'
@@ -10,8 +9,7 @@ import { isAdmin } from '@/lib/adminAuth'
 
 const schema = z.object({
   email: z.string().email(),
-  plushSlug: z.string().min(1),
-  plushName: z.string().min(1),
+  plushName: z.string().trim().optional(),
 })
 
 export type GenerateResult =
@@ -23,7 +21,6 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
 
   const parsed = schema.safeParse({
     email: formData.get('email'),
-    plushSlug: formData.get('plushSlug'),
     plushName: formData.get('plushName'),
   })
 
@@ -31,21 +28,19 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
     return { success: false, error: parsed.error.issues[0].message }
   }
 
-  const { email, plushSlug, plushName } = parsed.data
+  const { email } = parsed.data
+  const plushName = parsed.data.plushName || 'your bemellou plushie'
   const supabase = createAdminClient()
 
   const code = await claimPoolCode(supabase)
   if (!code) {
     return { success: false, error: 'Code pool is empty — import a new batch of codes first.' }
   }
-  const expiresAt = getExpiryDate(30)
 
   // Insert code
   const { error: insertError } = await supabase.from('access_codes').insert({
     email: email.toLowerCase(),
     code,
-    plush_type_slug: plushSlug,
-    expires_at: expiresAt.toISOString(),
     generated_by: 'admin',
   })
 
@@ -55,7 +50,7 @@ export async function generateCodeAction(formData: FormData): Promise<GenerateRe
 
   // Send email
   try {
-    const sendError = await sendAccessCodeEmail(supabase, { email, code, plushName, expiresAt })
+    const sendError = await sendAccessCodeEmail(supabase, { email, code, plushName })
 
     if (!sendError) {
       await supabase
@@ -99,13 +94,12 @@ export async function resendCodeAction(codeId: string): Promise<GenerateResult> 
 
   if (!record) return { success: false, error: 'Code not found' }
 
-  const plushName = (record.plush_types as { name: string } | null)?.name ?? 'Bemellou Plushie'
+  const plushName = (record.plush_types as { name: string } | null)?.name ?? 'your bemellou plushie'
 
   const sendError = await sendAccessCodeEmail(supabase, {
     email: record.email,
     code: record.code,
     plushName,
-    expiresAt: new Date(record.expires_at),
   })
 
   if (sendError) return { success: false, error: sendError }
