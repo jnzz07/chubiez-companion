@@ -72,6 +72,19 @@ export function AccessCodeEmail({
           fontStyle="normal"
         />
         <style>{`
+          /* The Gmail ANDROID APP (as opposed to Gmail web) most likely
+             renders this in a Chromium WebView subject to Android's
+             system-level "Force Dark" — a blunter mechanism than any
+             email client's own dark-mode CSS, and it ignores the meta
+             tags above and Gmail-web-specific [data-ogsc] hooks entirely.
+             Chromium's own documented escape hatch: declare color-scheme
+             as real CSS (not just meta) on the root, and make sure every
+             element has BOTH background-color and color explicitly set —
+             Chromium skips force-darkening any element the author has
+             fully specified both colors on. That's why every element
+             below carries an explicit background-color now, not just text
+             color, even ones that visually just sit on the page background. */
+          html, body { color-scheme: light !important; }
           @media only screen and (max-width: 480px) {
             .bmo-container { padding: 28px 16px !important; }
             .bmo-h1 { font-size: 22px !important; }
@@ -211,11 +224,13 @@ const container = {
   padding: '40px 20px',
   maxWidth: '520px',
   width: '100%',
+  backgroundColor: '#fffcf4',
 }
 
 const header = {
   textAlign: 'center' as const,
   marginBottom: '28px',
+  backgroundColor: '#fffcf4',
 }
 
 const logo = {
@@ -227,6 +242,7 @@ const logo = {
 const heroSection = {
   textAlign: 'center' as const,
   marginBottom: '32px',
+  backgroundColor: '#fffcf4',
 }
 
 const h1 = {
@@ -234,6 +250,7 @@ const h1 = {
   fontSize: '28px',
   fontWeight: '700',
   color: '#303030',
+  backgroundColor: '#fffcf4',
   margin: '0 0 12px',
   letterSpacing: '-0.5px',
   lineHeight: '1.25',
@@ -242,6 +259,7 @@ const h1 = {
 const subtitle = {
   fontSize: '16px',
   color: '#303030',
+  backgroundColor: '#fffcf4',
   opacity: 0.75,
   lineHeight: '1.6',
   margin: '0',
@@ -250,6 +268,7 @@ const subtitle = {
 const peekWrap = {
   textAlign: 'center' as const,
   marginBottom: '-18px',
+  backgroundColor: '#fffcf4',
 }
 
 const peekImg = {
@@ -272,6 +291,7 @@ const codeLabel = {
   fontSize: '12px',
   fontWeight: '600',
   color: '#8ed1fc',
+  backgroundColor: '#303030',
   letterSpacing: '2px',
   textTransform: 'uppercase' as const,
   margin: '0 0 12px',
@@ -281,6 +301,7 @@ const codeBlock = {
   fontSize: '38px',
   fontWeight: '700',
   color: '#fffcf4',
+  backgroundColor: '#303030',
   letterSpacing: '6px',
   whiteSpace: 'nowrap' as const,
   fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
@@ -290,6 +311,7 @@ const codeBlock = {
 const codeHint = {
   fontSize: '13px',
   color: '#fffcf4',
+  backgroundColor: '#303030',
   opacity: 0.6,
   margin: '0',
 }
@@ -297,11 +319,13 @@ const codeHint = {
 const ctaSection = {
   textAlign: 'center' as const,
   marginBottom: '24px',
+  backgroundColor: '#fffcf4',
 }
 
 const ctaOr = {
   fontSize: '14px',
   color: '#303030',
+  backgroundColor: '#fffcf4',
   opacity: 0.75,
   margin: '0',
 }
@@ -309,6 +333,7 @@ const ctaOr = {
 const storeSection = {
   textAlign: 'center' as const,
   marginBottom: '28px',
+  backgroundColor: '#fffcf4',
 }
 
 const storeLink = {
@@ -327,6 +352,7 @@ const quoteSection = {
   textAlign: 'center' as const,
   marginBottom: '32px',
   padding: '0 16px',
+  backgroundColor: '#fffcf4',
 }
 
 const quote = {
@@ -334,6 +360,7 @@ const quote = {
   fontStyle: 'italic' as const,
   fontSize: '17px',
   color: '#303030',
+  backgroundColor: '#fffcf4',
   lineHeight: '1.6',
   margin: '0',
   wordWrap: 'break-word' as const,
@@ -341,11 +368,13 @@ const quote = {
 
 const footerSection = {
   marginTop: '24px',
+  backgroundColor: '#fffcf4',
 }
 
 const footerStyle = {
   fontSize: '14px',
   color: '#303030',
+  backgroundColor: '#fffcf4',
   opacity: 0.75,
   lineHeight: '1.6',
   textAlign: 'center' as const,
