@@ -89,6 +89,17 @@ export function AccessCodeEmail({
             body, .bmo-bg { background-color: #fffcf4 !important; }
             .bmo-charcoal-text { color: #303030 !important; }
           }
+          /* Gmail's mobile app runs its own dark-mode engine that ignores
+             color-scheme meta tags entirely and auto-recolors elements
+             individually — it stamps [data-ogsc] (text) / [data-ogsb]
+             (background) onto whatever it decides to touch. This is the
+             documented way to override that per element and force every
+             surface back to its real brand color instead of Gmail's guess. */
+          [data-ogsc] .bmo-bg, [data-ogsb] .bmo-bg { background-color: #fffcf4 !important; }
+          [data-ogsc] .bmo-charcoal-text { color: #303030 !important; }
+          [data-ogsc] .bmo-dark-card, [data-ogsb] .bmo-dark-card { background-color: #303030 !important; }
+          [data-ogsc] .bmo-cream-text { color: #fffcf4 !important; }
+          [data-ogsc] .bmo-sky-text { color: #8ed1fc !important; }
         `}</style>
       </Head>
       <Preview>{heading}</Preview>
@@ -103,7 +114,7 @@ export function AccessCodeEmail({
           <tbody>
             <tr>
               <td align="center">
-                <Container style={container} className="bmo-container">
+                <Container style={container} className="bmo-container bmo-bg">
 
                   {/* Header — real Sky Blue wordmark on Soft Cream, per wordmark rule */}
                   <Section style={header}>
@@ -112,8 +123,8 @@ export function AccessCodeEmail({
 
           {/* Hero */}
           <Section style={heroSection}>
-            <Heading style={h1} className="bmo-h1">{heading}</Heading>
-            <Text style={subtitle}>{intro}</Text>
+            <Heading style={h1} className="bmo-h1 bmo-charcoal-text">{heading}</Heading>
+            <Text style={subtitle} className="bmo-charcoal-text">{intro}</Text>
           </Section>
 
           {/* Benny & Vita — mobile only. display:none by default (inline
@@ -128,15 +139,15 @@ export function AccessCodeEmail({
           </Section>
 
           {/* Code block — charcoal surface, sky blue label, cream code */}
-          <Section style={codeSection} className="bmo-code-section">
-            <Text style={codeLabel}>your access code</Text>
-            <Text style={codeBlock} className="bmo-code">{code}</Text>
-            <Text style={codeHint}>one-time use · never expires</Text>
+          <Section style={codeSection} className="bmo-code-section bmo-dark-card">
+            <Text style={codeLabel} className="bmo-sky-text">your access code</Text>
+            <Text style={codeBlock} className="bmo-code bmo-cream-text">{code}</Text>
+            <Text style={codeHint} className="bmo-cream-text">one-time use · never expires</Text>
           </Section>
 
           {/* CTA */}
           <Section style={ctaSection}>
-            <Text style={ctaOr}>type this code into the bemellou app to unlock it</Text>
+            <Text style={ctaOr} className="bmo-charcoal-text">type this code into the bemellou app to unlock it</Text>
           </Section>
 
           {/* App Store link — no official badge asset embedded (Apple requires
@@ -150,7 +161,7 @@ export function AccessCodeEmail({
 
           {/* Brand promise, italic accent */}
           <Section style={quoteSection}>
-            <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
+            <Text style={quote} className="bmo-quote bmo-charcoal-text">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
           {/* Footer — deliberately the SAME size/weight as the rest of the
@@ -161,9 +172,9 @@ export function AccessCodeEmail({
               removed. */}
           <Section style={footerSection}>
             {footer.split('\n').map((line, i) => (
-              <Text key={i} style={footerStyle}>{line}</Text>
+              <Text key={i} style={footerStyle} className="bmo-charcoal-text">{line}</Text>
             ))}
-            <Text style={footerStyle}>
+            <Text style={footerStyle} className="bmo-charcoal-text">
               bemellou · this code is for you only · please don&apos;t share it
             </Text>
           </Section>
