@@ -95,6 +95,7 @@ export function AccessCodeEmail({
             .bmo-code-section { padding: 22px 12px !important; }
             .bmo-logo { width: 130px !important; }
             .bmo-quote { font-size: 15px !important; }
+            .bmo-peek { display: block !important; }
           }
         `}</style>
       </Head>
@@ -113,11 +114,14 @@ export function AccessCodeEmail({
             <Text style={subtitle}>{intro}</Text>
           </Section>
 
-          {/* Benny & Vita peeking over the code card — real product photo,
-              background removed. The card behind (opaque, painted after in
-              flow) covers their lower half, so a negative margin here is
-              enough to fake the overlap without any positioning tricks. */}
-          <Section style={peekWrap}>
+          {/* Benny & Vita — mobile only. display:none by default (inline
+              CSS, honored far more consistently across mail clients than
+              the HTML `hidden` attribute); the max-width:480px query
+              above flips it back to block on phone mail apps that
+              support media queries (Gmail app, Apple Mail). Desktop
+              clients without media-query support (older Outlook) simply
+              never show it, which is the safe fallback for "computer". */}
+          <Section style={peekWrap} className="bmo-peek">
             <Img src={peekUrl} width="185" alt="" style={peekImg} />
           </Section>
 
@@ -147,19 +151,17 @@ export function AccessCodeEmail({
             <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
-          {/* No visual divider line here on purpose. A thin horizontal bar
-              directly followed by smaller, muted text is the classic
-              email-signature pattern — the exact thing Gmail's "quoted
-              content" heuristic looks for, regardless of which HTML tag
-              draws the line. Removing the line (not just changing its
-              tag) is the actual fix; spacing alone separates the sections. */}
-
-          {/* Footer */}
+          {/* Footer — deliberately the SAME size/weight as the rest of the
+              body (no smaller muted text block). A visually distinct
+              small-print block right after the main content is the
+              other classic "signature/quoted content" pattern mail
+              clients key off, on top of the divider line already
+              removed. */}
           <Section style={footerSection}>
             {footer.split('\n').map((line, i) => (
               <Text key={i} style={footerStyle}>{line}</Text>
             ))}
-            <Text style={footerSmall}>
+            <Text style={footerStyle}>
               bemellou · this code is for you only · please don&apos;t share it
             </Text>
           </Section>
@@ -225,6 +227,7 @@ const subtitle = {
 const peekWrap = {
   textAlign: 'center' as const,
   marginBottom: '-18px',
+  display: 'none' as const,
 }
 
 const peekImg = {
@@ -326,10 +329,3 @@ const footerStyle = {
   margin: '0 0 12px',
 }
 
-const footerSmall = {
-  fontSize: '12px',
-  color: '#303030',
-  opacity: 0.5,
-  textAlign: 'center' as const,
-  margin: '0',
-}
