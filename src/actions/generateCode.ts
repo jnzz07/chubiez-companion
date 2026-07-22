@@ -148,6 +148,103 @@ export async function importCodesAction(formData: FormData): Promise<ImportResul
   return { success: true, imported, skipped: codes.length - imported }
 }
 
+export type BulkSendResult =
+  | {
+      success: true
+      sent: number
+      skipped: number
+      failed: number
+      poolRanOut: boolean
+    }
+  | { success: false; error: string }
+
+interface BulkRow {
+  email: string
+  plushName: string
+}
+
+/** Parses pasted rows: "email" or "email,plush name" or "email\tplush name" per line. */
+function parseBulkRows(raw: string): BulkRow[] {
+  const seen = new Set<string>()
+  const rows: BulkRow[] = []
+
+  for (const line of raw.split('\n')) {
+    const parts = line.split(/\t|,/).map(p => p.trim())
+    const email = parts[0]?.toLowerCase()
+    if (!email || !email.includes('@')) continue
+    if (seen.has(email)) continue
+    seen.add(email)
+    rows.push({ email, plushName: parts[1] || 'your bemellou plushie' })
+  }
+
+  return rows
+}
+
+/**
+ * Sends access codes to a pasted list of customers who ordered before this
+ * tool existed (e.g. exported from Shopify Admin → Orders → Export).
+ * Skips any email that already has a code on file, so re-running a list
+ * (or a list with duplicates from multi-item orders) is always safe.
+ */
+export async function bulkSendCodesAction(formData: FormData): Promise<BulkSendResult> {
+  if (!(await isAdmin())) return { success: false, error: 'Unauthorized' }
+
+  const raw = String(formData.get('rows') ?? '')
+  const rows = parseBulkRows(raw)
+
+  if (rows.length === 0) {
+    return { success: false, error: 'No valid rows found — paste one email per line.' }
+  }
+
+  const supabase = createAdminClient()
+  let sent = 0
+  let skipped = 0
+  let failed = 0
+  let poolRanOut = false
+
+  for (const { email, plushName } of rows) {
+    const { data: existing } = await supabase
+      .from('access_codes')
+      .select('id')
+      .eq('email', email)
+      .limit(1)
+      .maybeSingle()
+
+    if (existing) {
+      skipped++
+      continue
+    }
+
+    const code = await claimPoolCode(supabase)
+    if (!code) {
+      poolRanOut = true
+      break
+    }
+
+    const { error: insertError } = await supabase.from('access_codes').insert({
+      email,
+      code,
+      generated_by: 'backfill',
+    })
+
+    if (insertError) {
+      failed++
+      continue
+    }
+
+    const sendError = await sendAccessCodeEmail(supabase, { email, code, plushName })
+    if (sendError) {
+      failed++
+      continue
+    }
+
+    await supabase.from('access_codes').update({ sent_at: new Date().toISOString() }).eq('code', code)
+    sent++
+  }
+
+  return { success: true, sent, skipped, failed, poolRanOut }
+}
+
 export type TemplateResult = { success: true } | { success: false; error: string }
 
 const templateSchema = z.object({

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { GenerateCodeForm } from '@/components/admin/GenerateCodeForm'
 import { ImportCodesForm } from '@/components/admin/ImportCodesForm'
 import { EmailTemplateForm } from '@/components/admin/EmailTemplateForm'
+import { BulkSendForm } from '@/components/admin/BulkSendForm'
 import { CodesTable } from '@/components/admin/CodesTable'
 import { getPoolStats } from '@/lib/codes/pool'
 import { getEmailTemplate } from '@/lib/email/settings'
@@ -92,6 +93,11 @@ export default async function AdminPage() {
           <ImportCodesForm />
           <GenerateCodeForm />
           <EmailTemplateForm template={template} />
+        </div>
+
+        {/* One-time backfill for pre-bot orders */}
+        <div className="mb-8">
+          <BulkSendForm />
         </div>
 
         {/* Codes table */}
