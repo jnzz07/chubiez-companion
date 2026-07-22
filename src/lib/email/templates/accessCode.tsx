@@ -93,7 +93,7 @@ export function AccessCodeEmail({
             .bmo-h1 { font-size: 22px !important; }
             .bmo-code { font-size: 30px !important; letter-spacing: 4px !important; }
             .bmo-code-section { padding: 22px 12px !important; }
-            .bmo-logo { width: 130px !important; }
+            .bmo-logo { width: 180px !important; }
             .bmo-quote { font-size: 15px !important; }
             .bmo-peek { display: block !important; }
           }
@@ -101,12 +101,22 @@ export function AccessCodeEmail({
       </Head>
       <Preview>{heading}</Preview>
       <Body style={main}>
-        <Container style={container} className="bmo-container">
+        {/* Full-bleed background wrapper: many mobile mail apps (Gmail app
+            especially) ignore the CSS background on <body> and fall back
+            to white, leaving a white frame around the Container on small
+            screens. A plain HTML bgcolor attribute on an outer 100%-width
+            table is honored far more consistently than any CSS approach,
+            so Soft Cream fills the entire viewport edge to edge. */}
+        <table role="presentation" width="100%" bgcolor="#fffcf4" style={outerTable}>
+          <tbody>
+            <tr>
+              <td align="center">
+                <Container style={container} className="bmo-container">
 
-          {/* Header — real Sky Blue wordmark on Soft Cream, per wordmark rule */}
-          <Section style={header}>
-            <Img src={logoUrl} width="160" alt="bemellou" style={logo} className="bmo-logo" />
-          </Section>
+                  {/* Header — real Sky Blue wordmark on Soft Cream, per wordmark rule */}
+                  <Section style={header}>
+                    <Img src={logoUrl} width="220" alt="bemellou" style={logo} className="bmo-logo" />
+                  </Section>
 
           {/* Hero */}
           <Section style={heroSection}>
@@ -166,7 +176,11 @@ export function AccessCodeEmail({
             </Text>
           </Section>
 
-        </Container>
+                </Container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </Body>
     </Html>
   )
@@ -181,6 +195,13 @@ export function AccessCodeEmail({
 const main = {
   backgroundColor: '#fffcf4',
   fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
+}
+
+const outerTable = {
+  backgroundColor: '#fffcf4',
+  margin: 0,
+  padding: 0,
+  borderCollapse: 'collapse' as const,
 }
 
 const container = {
@@ -260,7 +281,7 @@ const codeBlock = {
   color: '#fffcf4',
   letterSpacing: '6px',
   whiteSpace: 'nowrap' as const,
-  fontFamily: "'Courier New', monospace",
+  fontFamily: "'Baloo 2', 'Trebuchet MS', sans-serif",
   margin: '0 0 12px',
 }
 
@@ -294,7 +315,7 @@ const storeLink = {
   fontSize: '14px',
   fontWeight: '700',
   color: '#fffcf4',
-  backgroundColor: '#303030',
+  backgroundColor: '#0d7f6e',
   borderRadius: '8px',
   padding: '10px 20px',
   textDecoration: 'none',
@@ -310,7 +331,7 @@ const quote = {
   fontFamily: "'Gloria Hallelujah', Georgia, serif",
   fontStyle: 'italic' as const,
   fontSize: '17px',
-  color: '#0d7f6e',
+  color: '#303030',
   lineHeight: '1.6',
   margin: '0',
   wordWrap: 'break-word' as const,
