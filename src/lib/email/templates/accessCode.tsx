@@ -121,8 +121,8 @@ export function AccessCodeEmail({
               support media queries (Gmail app, Apple Mail). Desktop
               clients without media-query support (older Outlook) simply
               never show it, which is the safe fallback for "computer". */}
-          <Section style={peekWrap} className="bmo-peek">
-            <Img src={peekUrl} width="185" alt="" style={peekImg} />
+          <Section style={peekWrap}>
+            <Img src={peekUrl} width="185" alt="" style={peekImg} className="bmo-peek" />
           </Section>
 
           {/* Code block — charcoal surface, sky blue label, cream code */}
@@ -227,13 +227,13 @@ const subtitle = {
 const peekWrap = {
   textAlign: 'center' as const,
   marginBottom: '-18px',
-  display: 'none' as const,
 }
 
 const peekImg = {
   margin: '0 auto',
   height: 'auto',
   maxWidth: '100%',
+  display: 'none' as const,
 }
 
 const codeSection = {

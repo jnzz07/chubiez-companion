@@ -14,7 +14,13 @@ export interface EmailTemplate {
 }
 
 export const DEFAULT_TEMPLATE: EmailTemplate = {
-  subject: 'welcome to the family, your community is waiting for you inside',
+  // {{code}} at the end keeps every subject line unique per send. Gmail
+  // groups same-subject emails to the same recipient into one thread and
+  // auto-collapses parts it thinks repeat a previous message in that
+  // thread — a real risk here since testing means sending near-identical
+  // emails to the same inbox over and over. A unique subject prevents
+  // Gmail from ever treating two of these as the same conversation.
+  subject: 'welcome to the family, your community is waiting for you inside · {{code}}',
   heading: 'you took the first step.',
   intro:
     "that's not nothing. here's your code to get into the app, where you and your mellou can have a safe space to be yourselves.",
