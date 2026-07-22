@@ -16,10 +16,14 @@ export function BulkSendForm() {
       <div>
         <h2 className="font-semibold text-[#303030]">backfill past customers</h2>
         <p className="text-xs text-[#7a7a7a] mt-0.5">
-          for orders placed before this tool existed. export from Shopify Admin →
-          Orders → Export, then paste the email column here (plush name column optional,
-          comma or tab separated). one email per line. duplicates and emails that
-          already have a code are skipped automatically — safe to re-run.
+          for orders placed before this tool existed. paste one email per line
+          (export from Shopify Admin → Orders → Export → Email column). emails
+          that already have a code are skipped automatically — safe to re-run.
+        </p>
+        <p className="text-xs text-[#7a7a7a] mt-1">
+          ⚠ sends max <strong>60 per click</strong>, spaced out — bemellou.com is a brand-new
+          sending domain, and blasting hundreds at once risks the whole domain
+          landing in spam. paste in batches of 60, wait a bit between batches.
         </p>
       </div>
 
@@ -27,7 +31,7 @@ export function BulkSendForm() {
         name="rows"
         required
         rows={8}
-        placeholder={'jane@example.com, Anxiety Frog\njohn@example.com'}
+        placeholder={'jane@example.com\njohn@example.com'}
         className="w-full rounded-lg border border-[#E8E0D5] bg-white px-4 py-3 text-[#303030] placeholder-[#a8a8a8] font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[#8ed1fc] transition resize-y"
       />
 
@@ -46,6 +50,11 @@ export function BulkSendForm() {
               ⚠ code pool ran out mid-batch — import more codes and paste the remaining emails again.
             </span>
           )}
+          {state.capReached && (
+            <span className="block mt-1 text-[#303030]">
+              only the first 60 emails in your paste were sent — paste the rest as a new batch.
+            </span>
+          )}
         </div>
       )}
 
@@ -54,7 +63,7 @@ export function BulkSendForm() {
         disabled={isPending}
         className="w-full rounded-lg bg-[#0d7f6e] text-white font-semibold py-3 text-sm transition hover:bg-[#0a6a5c] disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'sending...' : 'send codes to this list'}
+        {isPending ? 'sending... this takes a minute, don\'t close the tab' : 'send codes to this list'}
       </button>
     </form>
   )
