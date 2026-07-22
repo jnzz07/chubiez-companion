@@ -44,6 +44,12 @@ export async function saveEmailTemplate(
   return error?.message ?? null
 }
 
+/** Deletes the saved override so future sends fall back to DEFAULT_TEMPLATE. */
+export async function resetEmailTemplate(supabase: SupabaseClient): Promise<string | null> {
+  const { error } = await supabase.from('app_settings').delete().eq('key', SETTINGS_KEY)
+  return error?.message ?? null
+}
+
 export function fillPlaceholders(
   text: string,
   vars: { plushName: string; code: string }

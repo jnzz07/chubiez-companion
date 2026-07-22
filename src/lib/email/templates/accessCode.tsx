@@ -24,14 +24,6 @@ interface AccessCodeEmailProps {
   footer: string
 }
 
-/** Splits a code into two halves with a trailing hyphen, e.g. "A3F9-" / "C21B",
- *  so it wraps like a hyphenated word instead of forcing one unreadable line
- *  on narrow phone screens. */
-function splitCode(code: string): [string, string] {
-  const mid = Math.ceil(code.length / 2)
-  return [code.slice(0, mid), code.slice(mid)]
-}
-
 export function AccessCodeEmail({
   code,
   logoUrl,
@@ -40,8 +32,6 @@ export function AccessCodeEmail({
   intro,
   footer,
 }: AccessCodeEmailProps) {
-  const [codeFirstHalf, codeSecondHalf] = splitCode(code)
-
   return (
     <Html>
       <Head>
@@ -135,19 +125,8 @@ export function AccessCodeEmail({
           {/* Code block — charcoal surface, sky blue label, cream code */}
           <Section style={codeSection} className="bmo-code-section">
             <Text style={codeLabel}>your access code</Text>
-            <Text style={codeBlock} className="bmo-code">
-              {codeSecondHalf ? (
-                <>
-                  {codeFirstHalf}-<br />
-                  {codeSecondHalf}
-                </>
-              ) : (
-                code
-              )}
-            </Text>
-            <Text style={codeHint}>
-              one-time use · never expires{codeSecondHalf ? ' · the dash is just a line break, skip it' : ''}
-            </Text>
+            <Text style={codeBlock} className="bmo-code">{code}</Text>
+            <Text style={codeHint}>one-time use · never expires</Text>
           </Section>
 
           {/* CTA */}
@@ -160,7 +139,7 @@ export function AccessCodeEmail({
               link instead. Android is on the way, add its link here later. */}
           <Section style={storeSection}>
             <Link href={APP_STORE_URL} style={storeLink}>
-              download bemellou on the App Store →
+              find the bemellou app on the App Store →
             </Link>
           </Section>
 
@@ -281,7 +260,7 @@ const codeBlock = {
   fontWeight: '700',
   color: '#fffcf4',
   letterSpacing: '6px',
-  lineHeight: '1.3',
+  whiteSpace: 'nowrap' as const,
   fontFamily: "'Courier New', monospace",
   margin: '0 0 12px',
 }

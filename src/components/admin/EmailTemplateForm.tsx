@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { saveTemplateAction, type TemplateResult } from '@/actions/generateCode'
+import { saveTemplateAction, resetTemplateAction, type TemplateResult } from '@/actions/generateCode'
 import type { EmailTemplate } from '@/lib/email/settings'
 
 const inputClass =
@@ -15,8 +15,13 @@ export function EmailTemplateForm({ template }: { template: EmailTemplate }) {
     null as TemplateResult | null
   )
 
+  const [resetState, resetAction, isResetting] = useActionState(
+    async () => resetTemplateAction(),
+    null as TemplateResult | null
+  )
+
   return (
-    <form action={formAction} className="bg-white rounded-xl border border-[#E8E0D5] p-6 flex flex-col gap-4">
+    <div className="bg-white rounded-xl border border-[#E8E0D5] p-6 flex flex-col gap-4">
       <div>
         <h2 className="font-semibold text-[#303030]">email template</h2>
         <p className="text-xs text-[#7a7a7a] mt-0.5">
@@ -26,46 +31,72 @@ export function EmailTemplateForm({ template }: { template: EmailTemplate }) {
         </p>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="subject" className="text-sm font-medium text-[#565656]">subject line</label>
-        <input id="subject" name="subject" required defaultValue={template.subject} className={inputClass} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="heading" className="text-sm font-medium text-[#565656]">heading</label>
-        <input id="heading" name="heading" required defaultValue={template.heading} className={inputClass} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="intro" className="text-sm font-medium text-[#565656]">intro paragraph</label>
-        <textarea id="intro" name="intro" required rows={3} defaultValue={template.intro} className={`${inputClass} resize-y`} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="footer" className="text-sm font-medium text-[#565656]">footer note</label>
-        <textarea id="footer" name="footer" required rows={3} defaultValue={template.footer} className={`${inputClass} resize-y`} />
-        <p className="text-xs text-[#7a7a7a]">line breaks become separate lines in the email</p>
-      </div>
-
-      {state && !state.success && (
-        <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">
-          {state.error}
+      <form action={formAction} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="subject" className="text-sm font-medium text-[#565656]">subject line</label>
+          <input id="subject" name="subject" required defaultValue={template.subject} className={inputClass} />
         </div>
-      )}
 
-      {state && state.success && (
-        <div className="rounded-lg bg-[#b5ead7]/40 border border-[#b5ead7] px-4 py-3 text-sm text-[#0d7f6e]">
-          template saved — every email from now on uses this copy
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="heading" className="text-sm font-medium text-[#565656]">heading</label>
+          <input id="heading" name="heading" required defaultValue={template.heading} className={inputClass} />
         </div>
-      )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full rounded-lg bg-[#0d7f6e] text-white font-semibold py-3 text-sm transition hover:bg-[#0a6a5c] disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isPending ? 'saving...' : 'save template'}
-      </button>
-    </form>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="intro" className="text-sm font-medium text-[#565656]">intro paragraph</label>
+          <textarea id="intro" name="intro" required rows={3} defaultValue={template.intro} className={`${inputClass} resize-y`} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="footer" className="text-sm font-medium text-[#565656]">footer note</label>
+          <textarea id="footer" name="footer" required rows={3} defaultValue={template.footer} className={`${inputClass} resize-y`} />
+          <p className="text-xs text-[#7a7a7a]">line breaks become separate lines in the email</p>
+        </div>
+
+        {state && !state.success && (
+          <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">
+            {state.error}
+          </div>
+        )}
+
+        {state && state.success && (
+          <div className="rounded-lg bg-[#b5ead7]/40 border border-[#b5ead7] px-4 py-3 text-sm text-[#0d7f6e]">
+            template saved, every email from now on uses this copy
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full rounded-lg bg-[#0d7f6e] text-white font-semibold py-3 text-sm transition hover:bg-[#0a6a5c] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? 'saving...' : 'save template'}
+        </button>
+      </form>
+
+      <form action={resetAction} className="border-t border-[#E8E0D5] pt-4 flex flex-col gap-2">
+        <p className="text-xs text-[#7a7a7a]">
+          fields above showing old or unexpected copy? this clears whatever was saved and goes
+          back to bemellou's current default wording.
+        </p>
+        {resetState && !resetState.success && (
+          <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-2 text-xs text-red-600">
+            {resetState.error}
+          </div>
+        )}
+        {resetState && resetState.success && (
+          <div className="rounded-lg bg-[#b5ead7]/40 border border-[#b5ead7] px-4 py-2 text-xs text-[#0d7f6e]">
+            reset, reload the page to see the default copy in the fields above
+          </div>
+        )}
+        <button
+          type="submit"
+          disabled={isResetting}
+          className="text-xs text-[#7a7a7a] hover:text-[#303030] transition underline disabled:opacity-50 self-start"
+        >
+          {isResetting ? 'resetting...' : 'reset to bemellou default'}
+        </button>
+      </form>
+    </div>
   )
 }

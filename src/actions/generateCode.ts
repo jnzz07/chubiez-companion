@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { claimPoolCode, parseCodeSheet } from '@/lib/codes/pool'
 import { sendAccessCodeEmail } from '@/lib/email/sendAccessCode'
-import { saveEmailTemplate, type EmailTemplate } from '@/lib/email/settings'
+import { saveEmailTemplate, resetEmailTemplate, type EmailTemplate } from '@/lib/email/settings'
 import { isAdmin } from '@/lib/adminAuth'
 
 const schema = z.object({
@@ -289,5 +289,16 @@ export async function saveTemplateAction(formData: FormData): Promise<TemplateRe
   const error = await saveEmailTemplate(supabase, parsed.data as EmailTemplate)
 
   if (error) return { success: false, error: `Save failed: ${error}` }
+  return { success: true }
+}
+
+/** Deletes the saved template override, reverting to the code-level DEFAULT_TEMPLATE. */
+export async function resetTemplateAction(): Promise<TemplateResult> {
+  if (!(await isAdmin())) return { success: false, error: 'Unauthorized' }
+
+  const supabase = createAdminClient()
+  const error = await resetEmailTemplate(supabase)
+
+  if (error) return { success: false, error: `Reset failed: ${error}` }
   return { success: true }
 }
