@@ -36,17 +36,19 @@ export async function sendAccessCodeEmail(
     })
   )
 
-  // A random, meaningless reference token (never the real access code)
-  // appended to every subject, so each send is guaranteed unique — this is
-  // what keeps Gmail from grouping repeated sends into one thread and
-  // auto-collapsing content. Never expose the actual code here: subject
-  // lines show up in notifications and lock screens.
-  const ref = randomBytes(3).toString('hex').toUpperCase()
+  // Invisible uniqueness: a random run of zero-width spaces appended to
+  // the subject. Nothing visible shows up (no code-looking token, no
+  // extra characters a recipient can see), but the underlying string is
+  // still byte-for-byte different every send — which is what keeps Gmail
+  // from grouping repeated sends into one thread and auto-collapsing
+  // content behind "...". Purely cosmetic-invisible, not a real code.
+  const ZERO_WIDTH_SPACE = String.fromCharCode(0x200b)
+  const invisibleUniquePad = ZERO_WIDTH_SPACE.repeat(1 + (randomBytes(1)[0] % 20))
 
   const { error } = await getResend().emails.send({
     from: FROM_ADDRESS,
     to: email,
-    subject: `${fillPlaceholders(template.subject, vars)} · ${ref}`,
+    subject: `${fillPlaceholders(template.subject, vars)}${invisibleUniquePad}`,
     html,
   })
 
