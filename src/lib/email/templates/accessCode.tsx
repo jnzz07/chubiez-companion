@@ -148,13 +148,14 @@ export function AccessCodeEmail({
             <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
-          {/* Plain styled bar instead of a semantic <hr> — mail clients
-              (Gmail especially) use a bare <hr> as a strong signal for
-              'start of quoted/forwarded content' and will auto-collapse
-              everything around it behind a '...' toggle. */}
-          <Section style={dividerWrap}>
-            <div style={dividerBar} />
-          </Section>
+          {/* Plain colored Section instead of <hr> or a nested raw <div> —
+              both a bare <hr> tag and a raw HTML element nested inside
+              react-email's table-based <Section> are things mail clients
+              (Gmail especially) can misparse as 'start of quoted content'
+              and collapse behind a '...' toggle. A Section styled directly
+              as the bar renders as a single plain table cell, nothing to
+              misinterpret. */}
+          <Section style={dividerBar} />
 
           {/* Footer */}
           <Section>
@@ -227,7 +228,6 @@ const subtitle = {
 const peekWrap = {
   textAlign: 'center' as const,
   marginBottom: '-18px',
-  position: 'relative' as const,
 }
 
 const peekImg = {
@@ -242,7 +242,6 @@ const codeSection = {
   padding: '32px 16px',
   textAlign: 'center' as const,
   marginBottom: '32px',
-  position: 'relative' as const,
 }
 
 const codeLabel = {
@@ -317,14 +316,12 @@ const quote = {
   wordWrap: 'break-word' as const,
 }
 
-const dividerWrap = {
-  margin: '0 0 24px',
-}
-
 const dividerBar = {
   height: '1px',
   width: '100%',
-  backgroundColor: 'rgba(48, 48, 48, 0.12)',
+  backgroundColor: '#EDE7DB',
+  margin: '0 0 24px',
+  padding: 0,
 }
 
 const footerStyle = {
