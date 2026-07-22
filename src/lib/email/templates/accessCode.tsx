@@ -35,6 +35,13 @@ export function AccessCodeEmail({
   return (
     <Html>
       <Head>
+        {/* Opt out of automatic dark-mode reprocessing. Without these,
+            clients like Apple Mail and Outlook auto-adjust colors when the
+            device is in dark mode, and the auto-adjustment on a light
+            cream background is exactly what produces an ugly yellow/tan
+            tint — this template is intentionally light-themed already. */}
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
         {/*
           Most phone mail apps (Gmail app on iOS/Android especially) strip
           @font-face entirely and always render the fallback — they never
@@ -97,6 +104,14 @@ export function AccessCodeEmail({
             .bmo-quote { font-size: 15px !important; }
             .bmo-peek { display: block !important; }
           }
+          /* Second safety net against dark-mode auto-tinting, for clients
+             that partially ignore the color-scheme meta tags and instead
+             react to this media query directly. Re-asserts the real brand
+             colors so nothing gets auto-inverted or tinted. */
+          @media (prefers-color-scheme: dark) {
+            body, .bmo-bg { background-color: #fffcf4 !important; }
+            .bmo-charcoal-text { color: #303030 !important; }
+          }
         `}</style>
       </Head>
       <Preview>{heading}</Preview>
@@ -107,7 +122,7 @@ export function AccessCodeEmail({
             screens. A plain HTML bgcolor attribute on an outer 100%-width
             table is honored far more consistently than any CSS approach,
             so Soft Cream fills the entire viewport edge to edge. */}
-        <table role="presentation" width="100%" bgcolor="#fffcf4" style={outerTable}>
+        <table role="presentation" width="100%" bgcolor="#fffcf4" style={outerTable} className="bmo-bg">
           <tbody>
             <tr>
               <td align="center">
