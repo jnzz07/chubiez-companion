@@ -15,9 +15,9 @@ export interface EmailTemplate {
 
 export const DEFAULT_TEMPLATE: EmailTemplate = {
   subject: 'welcome to the family, {{plush_name}} is yours',
-  heading: 'you took the first step.',
+  heading: 'welcome to the family, your community is waiting for you inside.',
   intro:
-    "that's not nothing. here's your code to get into the app, where {{plush_name}} is already waiting for you.",
+    "that's not nothing. here's your code to get into the app, where you and your mellou can have a safe space to be yourselves.",
   footer:
     'you bought a {{plush_name}}. we think that was a good call.\nquestions? reply to this email or hit us at support@bemellou.com\nthis code never expires, no rush.',
 }
