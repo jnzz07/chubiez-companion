@@ -18,10 +18,10 @@ export function BulkSendForm() {
         <p className="text-xs text-[#7a7a7a] mt-0.5">
           for orders placed before this tool existed. paste one email per line
           (export from Shopify Admin → Orders → Export → Email column). emails
-          that already have a code are skipped automatically — safe to re-run.
+          that already have a code are skipped automatically, safe to re-run.
         </p>
         <p className="text-xs text-[#7a7a7a] mt-1">
-          ⚠ sends max <strong>60 per click</strong>, spaced out — bemellou.com is a brand-new
+          <strong>note:</strong> sends max <strong>60 per click</strong>, spaced out. bemellou.com is a brand-new
           sending domain, and blasting hundreds at once risks the whole domain
           landing in spam. paste in batches of 60, wait a bit between batches.
         </p>
@@ -47,7 +47,7 @@ export function BulkSendForm() {
           {state.failed > 0 && ` · ${state.failed} failed`}
           {state.poolRanOut && (
             <span className="block mt-1 text-[#303030]">
-              ⚠ code pool ran out mid-batch — import more codes and paste the remaining emails again.
+              <strong>note:</strong> code pool ran out mid-batch, import more codes and paste the remaining emails again.
             </span>
           )}
           {state.capReached && (

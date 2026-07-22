@@ -83,7 +83,7 @@ export default async function AdminPage() {
         {/* Low pool warning */}
         {pool.available < 20 && (
           <div className="mb-8 rounded-lg bg-[#fde8b8]/60 border border-[#fde8b8] px-5 py-4 text-sm text-[#303030]">
-            ⚠ only <strong>{pool.available}</strong> code{pool.available === 1 ? '' : 's'} left in the pool —
+            <strong>low pool:</strong> only {pool.available} code{pool.available === 1 ? '' : 's'} left.
             export a new batch from the Bemellou app and import it below before orders start failing.
           </div>
         )}

@@ -20,12 +20,15 @@ export async function sendAccessCodeEmail(
 ): Promise<string | null> {
   const template = await getEmailTemplate(supabase)
   const vars = { plushName, code }
-  const logoUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://bemellou-companion-production.up.railway.app'}/brand/wordmark-sky.png`
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://bemellou-companion-production.up.railway.app'
+  const logoUrl = `${appUrl}/brand/wordmark-sky.png`
+  const peekUrl = `${appUrl}/brand/benny-vita-peek.png`
 
   const html = await render(
     AccessCodeEmail({
       code,
       logoUrl,
+      peekUrl,
       heading: fillPlaceholders(template.heading, vars),
       intro: fillPlaceholders(template.intro, vars),
       footer: fillPlaceholders(template.footer, vars),

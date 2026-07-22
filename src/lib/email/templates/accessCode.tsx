@@ -17,6 +17,7 @@ const APP_STORE_URL = 'https://apps.apple.com/us/app/bemellou/id6776437223'
 interface AccessCodeEmailProps {
   code: string
   logoUrl: string
+  peekUrl: string
   /* Team-editable copy — placeholders already filled by sendAccessCodeEmail */
   heading: string
   intro: string
@@ -34,6 +35,7 @@ function splitCode(code: string): [string, string] {
 export function AccessCodeEmail({
   code,
   logoUrl,
+  peekUrl,
   heading,
   intro,
   footer,
@@ -103,6 +105,7 @@ export function AccessCodeEmail({
             .bmo-code-section { padding: 22px 12px !important; }
             .bmo-logo { width: 130px !important; }
             .bmo-quote { font-size: 15px !important; }
+            .bmo-peek { width: 140px !important; }
           }
         `}</style>
       </Head>
@@ -119,6 +122,14 @@ export function AccessCodeEmail({
           <Section style={heroSection}>
             <Heading style={h1} className="bmo-h1">{heading}</Heading>
             <Text style={subtitle}>{intro}</Text>
+          </Section>
+
+          {/* Benny & Vita peeking over the code card — real product photo,
+              background removed. The card behind (opaque, painted after in
+              flow) covers their lower half, so a negative margin here is
+              enough to fake the overlap without any positioning tricks. */}
+          <Section style={peekWrap}>
+            <Img src={peekUrl} width="185" alt="" style={peekImg} className="bmo-peek" />
           </Section>
 
           {/* Code block — charcoal surface, sky blue label, cream code */}
@@ -234,12 +245,25 @@ const subtitle = {
   margin: '0',
 }
 
+const peekWrap = {
+  textAlign: 'center' as const,
+  marginBottom: '-18px',
+  position: 'relative' as const,
+}
+
+const peekImg = {
+  margin: '0 auto',
+  height: 'auto',
+  maxWidth: '100%',
+}
+
 const codeSection = {
   backgroundColor: '#303030',
   borderRadius: '16px',
   padding: '32px 16px',
   textAlign: 'center' as const,
   marginBottom: '32px',
+  position: 'relative' as const,
 }
 
 const codeLabel = {

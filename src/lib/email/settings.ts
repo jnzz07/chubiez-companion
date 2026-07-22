@@ -14,7 +14,7 @@ export interface EmailTemplate {
 }
 
 export const DEFAULT_TEMPLATE: EmailTemplate = {
-  subject: 'welcome to the family, {{plush_name}} is yours 🤍',
+  subject: 'welcome to the family, {{plush_name}} is yours',
   heading: 'you took the first step.',
   intro:
     "that's not nothing. here's your code to get into the app, where {{plush_name}} is already waiting for you.",
