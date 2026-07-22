@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { render } from '@react-email/render'
 import { getResend, FROM_ADDRESS } from '@/lib/email/resend'
@@ -35,10 +36,17 @@ export async function sendAccessCodeEmail(
     })
   )
 
+  // A random, meaningless reference token (never the real access code)
+  // appended to every subject, so each send is guaranteed unique — this is
+  // what keeps Gmail from grouping repeated sends into one thread and
+  // auto-collapsing content. Never expose the actual code here: subject
+  // lines show up in notifications and lock screens.
+  const ref = randomBytes(3).toString('hex').toUpperCase()
+
   const { error } = await getResend().emails.send({
     from: FROM_ADDRESS,
     to: email,
-    subject: fillPlaceholders(template.subject, vars),
+    subject: `${fillPlaceholders(template.subject, vars)} · ${ref}`,
     html,
   })
 
