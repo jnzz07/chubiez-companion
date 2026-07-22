@@ -14,12 +14,12 @@ export interface EmailTemplate {
 }
 
 export const DEFAULT_TEMPLATE: EmailTemplate = {
-  subject: 'your {{plush_name}} is ready 🤍',
-  heading: 'your {{plush_name}} is ready.',
+  subject: 'welcome to the family, {{plush_name}} is yours 🤍',
+  heading: 'you took the first step.',
   intro:
-    'use this code to enter the companion app — your little corner of the internet where you and your chubi can exist unbothered.',
+    "that's not nothing. here's your code to get into the app, where {{plush_name}} is already waiting for you.",
   footer:
-    'you bought a {{plush_name}}. we think that was a good call.\nquestions? reply to this email or hit us at support@bemellou.com\nthis code never expires — no rush.',
+    'you bought a {{plush_name}}. we think that was a good call.\nquestions? reply to this email or hit us at support@bemellou.com\nthis code never expires, no rush.',
 }
 
 const SETTINGS_KEY = 'access_code_email'

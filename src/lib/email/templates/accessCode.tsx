@@ -20,6 +20,14 @@ interface AccessCodeEmailProps {
   footer: string
 }
 
+/** Splits a code into two halves with a trailing hyphen, e.g. "A3F9-" / "C21B",
+ *  so it wraps like a hyphenated word instead of forcing one unreadable line
+ *  on narrow phone screens. */
+function splitCode(code: string): [string, string] {
+  const mid = Math.ceil(code.length / 2)
+  return [code.slice(0, mid), code.slice(mid)]
+}
+
 export function AccessCodeEmail({
   code,
   logoUrl,
@@ -27,6 +35,8 @@ export function AccessCodeEmail({
   intro,
   footer,
 }: AccessCodeEmailProps) {
+  const [codeFirstHalf, codeSecondHalf] = splitCode(code)
+
   return (
     <Html>
       <Head>
@@ -111,8 +121,19 @@ export function AccessCodeEmail({
           {/* Code block — charcoal surface, sky blue label, cream code */}
           <Section style={codeSection} className="bmo-code-section">
             <Text style={codeLabel}>your access code</Text>
-            <Text style={codeBlock} className="bmo-code">{code}</Text>
-            <Text style={codeHint}>one-time use · never expires</Text>
+            <Text style={codeBlock} className="bmo-code">
+              {codeSecondHalf ? (
+                <>
+                  {codeFirstHalf}-<br />
+                  {codeSecondHalf}
+                </>
+              ) : (
+                code
+              )}
+            </Text>
+            <Text style={codeHint}>
+              one-time use · never expires{codeSecondHalf ? ' · the dash is just a line break, skip it' : ''}
+            </Text>
           </Section>
 
           {/* CTA */}
@@ -224,9 +245,9 @@ const codeBlock = {
   fontWeight: '700',
   color: '#fffcf4',
   letterSpacing: '6px',
+  lineHeight: '1.3',
   fontFamily: "'Courier New', monospace",
   margin: '0 0 12px',
-  wordBreak: 'break-all' as const,
 }
 
 const codeHint = {
