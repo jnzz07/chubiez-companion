@@ -6,10 +6,13 @@ import {
   Heading,
   Html,
   Img,
+  Link,
   Preview,
   Section,
   Text,
 } from '@react-email/components'
+
+const APP_STORE_URL = 'https://apps.apple.com/us/app/bemellou/id6776437223'
 
 interface AccessCodeEmailProps {
   code: string
@@ -141,6 +144,15 @@ export function AccessCodeEmail({
             <Text style={ctaOr}>type this code into the bemellou app to unlock it</Text>
           </Section>
 
+          {/* App Store link — no official badge asset embedded (Apple requires
+              their unmodified artwork, not a recreation), so a plain styled
+              link instead. Android is on the way, add its link here later. */}
+          <Section style={storeSection}>
+            <Link href={APP_STORE_URL} style={storeLink}>
+              download bemellou on the App Store →
+            </Link>
+          </Section>
+
           {/* Brand promise, Gloria Hallelujah accent per typography rules */}
           <Section style={quoteSection}>
             <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
@@ -267,6 +279,23 @@ const ctaOr = {
   color: '#303030',
   opacity: 0.75,
   margin: '0',
+}
+
+const storeSection = {
+  textAlign: 'center' as const,
+  marginBottom: '28px',
+}
+
+const storeLink = {
+  display: 'inline-block',
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
+  fontSize: '14px',
+  fontWeight: '700',
+  color: '#fffcf4',
+  backgroundColor: '#303030',
+  borderRadius: '8px',
+  padding: '10px 20px',
+  textDecoration: 'none',
 }
 
 const quoteSection = {
