@@ -148,17 +148,15 @@ export function AccessCodeEmail({
             <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
-          {/* Plain colored Section instead of <hr> or a nested raw <div> —
-              both a bare <hr> tag and a raw HTML element nested inside
-              react-email's table-based <Section> are things mail clients
-              (Gmail especially) can misparse as 'start of quoted content'
-              and collapse behind a '...' toggle. A Section styled directly
-              as the bar renders as a single plain table cell, nothing to
-              misinterpret. */}
-          <Section style={dividerBar} />
+          {/* No visual divider line here on purpose. A thin horizontal bar
+              directly followed by smaller, muted text is the classic
+              email-signature pattern — the exact thing Gmail's "quoted
+              content" heuristic looks for, regardless of which HTML tag
+              draws the line. Removing the line (not just changing its
+              tag) is the actual fix; spacing alone separates the sections. */}
 
           {/* Footer */}
-          <Section>
+          <Section style={footerSection}>
             {footer.split('\n').map((line, i) => (
               <Text key={i} style={footerStyle}>{line}</Text>
             ))}
@@ -316,12 +314,8 @@ const quote = {
   wordWrap: 'break-word' as const,
 }
 
-const dividerBar = {
-  height: '1px',
-  width: '100%',
-  backgroundColor: '#EDE7DB',
-  margin: '0 0 24px',
-  padding: 0,
+const footerSection = {
+  marginTop: '24px',
 }
 
 const footerStyle = {
