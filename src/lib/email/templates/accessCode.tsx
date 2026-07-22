@@ -95,6 +95,7 @@ export function AccessCodeEmail({
             .bmo-code-section { padding: 22px 12px !important; }
             .bmo-logo { width: 130px !important; }
             .bmo-quote { font-size: 15px !important; }
+            .bmo-peek { width: 140px !important; }
           }
         `}</style>
       </Head>
@@ -118,7 +119,7 @@ export function AccessCodeEmail({
               flow) covers their lower half, so a negative margin here is
               enough to fake the overlap without any positioning tricks. */}
           <Section style={peekWrap}>
-            <Img src={peekUrl} width="185" alt="" style={peekImg} />
+            <Img src={peekUrl} width="185" alt="" style={peekImg} className="bmo-peek" />
           </Section>
 
           {/* Code block — charcoal surface, sky blue label, cream code */}
