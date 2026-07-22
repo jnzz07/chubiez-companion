@@ -52,16 +52,6 @@ export function AccessCodeEmail({
           closest system-safe match to Quicksand's geometry.
         */}
         <Font
-          fontFamily="Baloo 2"
-          fallbackFontFamily="Trebuchet MS"
-          webFont={{
-            url: 'https://fonts.gstatic.com/s/baloo2/v23/wXK0E3kTposypRydzVT08TS3JnAmtdj9yqpv.ttf',
-            format: 'truetype',
-          }}
-          fontWeight={700}
-          fontStyle="normal"
-        />
-        <Font
           fontFamily="Quicksand"
           fallbackFontFamily="Trebuchet MS"
           webFont={{
@@ -79,19 +69,6 @@ export function AccessCodeEmail({
             format: 'truetype',
           }}
           fontWeight={700}
-          fontStyle="normal"
-        />
-        {/* Gloria Hallelujah almost never loads on mobile mail apps — its
-            fallback below is styled to still look like an intentional
-            accent (italic serif) rather than a broken generic cursive. */}
-        <Font
-          fontFamily="Gloria Hallelujah"
-          fallbackFontFamily="Georgia"
-          webFont={{
-            url: 'https://fonts.gstatic.com/s/gloriahallelujah/v24/LYjYdHv3kUk9BMV96EIswT9DIbW-MLSy.ttf',
-            format: 'truetype',
-          }}
-          fontWeight={400}
           fontStyle="normal"
         />
         <style>{`
@@ -171,7 +148,7 @@ export function AccessCodeEmail({
             </Link>
           </Section>
 
-          {/* Brand promise, Gloria Hallelujah accent per typography rules */}
+          {/* Brand promise, italic accent */}
           <Section style={quoteSection}>
             <Text style={quote} className="bmo-quote">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
@@ -204,8 +181,7 @@ export function AccessCodeEmail({
 // ── Styles — Bemellou Brand Book palette ────────────────────────────────────
 // Soft Cream #fffcf4 (background, never pure white) · Charcoal #303030 (text,
 // never pure black) · Sky Blue #8ed1fc (primary/highlights) · Rich Teal
-// #0d7f6e (CTA only). Baloo 2 for headlines, Quicksand for body,
-// Gloria Hallelujah for the one brand-promise accent line — max 2 lines.
+// #0d7f6e (CTA only). Quicksand throughout — the only font used in this email.
 
 const main = {
   backgroundColor: '#fffcf4',
@@ -243,7 +219,7 @@ const heroSection = {
 }
 
 const h1 = {
-  fontFamily: "'Baloo 2', 'Trebuchet MS', sans-serif",
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
   fontSize: '28px',
   fontWeight: '700',
   color: '#303030',
@@ -296,7 +272,7 @@ const codeBlock = {
   color: '#fffcf4',
   letterSpacing: '6px',
   whiteSpace: 'nowrap' as const,
-  fontFamily: "'Baloo 2', 'Trebuchet MS', sans-serif",
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
   margin: '0 0 12px',
 }
 
@@ -343,7 +319,7 @@ const quoteSection = {
 }
 
 const quote = {
-  fontFamily: "'Gloria Hallelujah', Georgia, serif",
+  fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
   fontStyle: 'italic' as const,
   fontSize: '17px',
   color: '#303030',
