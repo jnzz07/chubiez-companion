@@ -18,8 +18,6 @@ interface AccessCodeEmailProps {
   code: string
   logoUrl: string
   peekUrl: string
-  creamBgUrl: string
-  darkBgUrl: string
   /* Team-editable copy — placeholders already filled by sendAccessCodeEmail */
   heading: string
   intro: string
@@ -30,8 +28,6 @@ export function AccessCodeEmail({
   code,
   logoUrl,
   peekUrl,
-  creamBgUrl,
-  darkBgUrl,
   heading,
   intro,
   footer,
@@ -39,13 +35,12 @@ export function AccessCodeEmail({
   return (
     <Html>
       <Head>
-        {/* Opt out of automatic dark-mode reprocessing. Without these,
-            clients like Apple Mail and Outlook auto-adjust colors when the
-            device is in dark mode, and the auto-adjustment on a light
-            cream background is exactly what produces an ugly yellow/tan
-            tint — this template is intentionally light-themed already. */}
-        <meta name="color-scheme" content="light" />
-        <meta name="supported-color-schemes" content="light" />
+        {/* Declares that this email provides its own authored light AND
+            dark variant (see the prefers-color-scheme block below) — this
+            tells clients to trust our design rather than substituting
+            their own automatic recoloring. */}
+        <meta name="color-scheme" content="light dark" />
+        <meta name="supported-color-schemes" content="light dark" />
         {/*
           Most phone mail apps (Gmail app on iOS/Android especially) strip
           @font-face entirely and always render the fallback — they never
@@ -76,19 +71,6 @@ export function AccessCodeEmail({
           fontStyle="normal"
         />
         <style>{`
-          /* The Gmail ANDROID APP (as opposed to Gmail web) most likely
-             renders this in a Chromium WebView subject to Android's
-             system-level "Force Dark" — a blunter mechanism than any
-             email client's own dark-mode CSS, and it ignores the meta
-             tags above and Gmail-web-specific [data-ogsc] hooks entirely.
-             Chromium's own documented escape hatch: declare color-scheme
-             as real CSS (not just meta) on the root, and make sure every
-             element has BOTH background-color and color explicitly set —
-             Chromium skips force-darkening any element the author has
-             fully specified both colors on. That's why every element
-             below carries an explicit background-color now, not just text
-             color, even ones that visually just sit on the page background. */
-          html, body { color-scheme: light !important; }
           @media only screen and (max-width: 480px) {
             .bmo-container { padding: 28px 16px !important; }
             .bmo-h1 { font-size: 22px !important; }
@@ -98,45 +80,41 @@ export function AccessCodeEmail({
             .bmo-quote { font-size: 15px !important; }
             .bmo-peek { display: block !important; }
           }
-          /* Second safety net against dark-mode auto-tinting, for clients
-             that partially ignore the color-scheme meta tags and instead
-             react to this media query directly. Re-asserts the real brand
-             colors so nothing gets auto-inverted or tinted. */
+          /* After five attempts to force this email to stay on its light
+             colors regardless of device theme (meta tags, media-query
+             overrides, Gmail-web [data-ogsc] hooks, explicit color pairs,
+             image-based backgrounds), none reliably stopped the iOS Gmail
+             app's own dark-mode reprocessing. The correct approach instead
+             of continuing to fight it: author an intentional dark palette
+             using real brand colors, so whatever triggers dark mode shows
+             something designed on purpose. Page and card swap roles: page
+             becomes Charcoal, the code card becomes a cream "spotlight"
+             surface — both colors are already in the brand palette, so it
+             reads as intentional, not inverted-by-accident.
+             https://developers.google.com/gmail supports this pattern. */
           @media (prefers-color-scheme: dark) {
-            body, .bmo-bg { background-color: #fffcf4 !important; }
-            .bmo-charcoal-text { color: #303030 !important; }
+            .bmo-bg { background-color: #303030 !important; }
+            .bmo-charcoal-text { color: #fffcf4 !important; }
+            .bmo-dark-card { background-color: #fffcf4 !important; }
+            .bmo-cream-text { color: #303030 !important; }
+            .bmo-sky-text { color: #0d7f6e !important; }
           }
-          /* Gmail's mobile app runs its own dark-mode engine that ignores
-             color-scheme meta tags entirely and auto-recolors elements
-             individually — it stamps [data-ogsc] (text) / [data-ogsb]
-             (background) onto whatever it decides to touch. This is the
-             documented way to override that per element and force every
-             surface back to its real brand color instead of Gmail's guess. */
-          [data-ogsc] .bmo-bg, [data-ogsb] .bmo-bg { background-color: #fffcf4 !important; }
-          [data-ogsc] .bmo-charcoal-text { color: #303030 !important; }
-          [data-ogsc] .bmo-dark-card, [data-ogsb] .bmo-dark-card { background-color: #303030 !important; }
-          [data-ogsc] .bmo-cream-text { color: #fffcf4 !important; }
-          [data-ogsc] .bmo-sky-text { color: #8ed1fc !important; }
+          [data-ogsc] .bmo-bg, [data-ogsb] .bmo-bg { background-color: #303030 !important; }
+          [data-ogsc] .bmo-charcoal-text { color: #fffcf4 !important; }
+          [data-ogsc] .bmo-dark-card, [data-ogsb] .bmo-dark-card { background-color: #fffcf4 !important; }
+          [data-ogsc] .bmo-cream-text { color: #303030 !important; }
+          [data-ogsc] .bmo-sky-text { color: #0d7f6e !important; }
         `}</style>
       </Head>
       <Preview>{heading}</Preview>
       <Body style={main}>
-        {/* Full-bleed background wrapper. Every dark-mode mechanism we've
-            hit (Gmail's own re-coloring, Android Force Dark, whatever the
-            iOS Gmail app does) targets DECLARED COLORS — bgcolor,
-            background-color, CSS color-scheme. None of them repaint pixels
-            inside a raster image. Using a solid-color tile PNG as the
-            actual background (via the legacy HTML `background` attribute,
-            which email clients still widely honor on tables) makes this
-            immune to color-based dark-mode reprocessing entirely,
-            regardless of client or OS. bgcolor + CSS stay as fallbacks
-            for the rare client that blocks images. */}
+        {/* Full-bleed background wrapper — plain color (not an image),
+            since the dark-mode CSS below needs to actually repaint this. */}
         <table
           role="presentation"
           width="100%"
           bgcolor="#fffcf4"
-          background={creamBgUrl}
-          style={{ ...outerTable, backgroundImage: `url(${creamBgUrl})`, backgroundRepeat: 'repeat' }}
+          style={outerTable}
           className="bmo-bg"
         >
           <tbody>
@@ -145,12 +123,12 @@ export function AccessCodeEmail({
                 <Container style={container} className="bmo-container bmo-bg">
 
                   {/* Header — real Sky Blue wordmark on Soft Cream, per wordmark rule */}
-                  <Section style={header}>
+                  <Section style={header} className="bmo-bg">
                     <Img src={logoUrl} width="220" alt="bemellou" style={logo} className="bmo-logo" />
                   </Section>
 
           {/* Hero */}
-          <Section style={heroSection}>
+          <Section style={heroSection} className="bmo-bg">
             <Heading style={h1} className="bmo-h1 bmo-charcoal-text">{heading}</Heading>
             <Text style={subtitle} className="bmo-charcoal-text">{intro}</Text>
           </Section>
@@ -166,18 +144,12 @@ export function AccessCodeEmail({
             <Img src={peekUrl} width="185" alt="" style={peekImg} className="bmo-peek" />
           </Section>
 
-          {/* Code block — charcoal surface, sky blue label, cream code.
-              Raw table with an image-based background (same reasoning as
-              the outer wrapper): this card's darkness must never flip to
-              light under any dark-mode engine, and a color value is
-              exactly what those engines target. A tiled charcoal PNG
-              can't be recolored the way a CSS background-color can. */}
+          {/* Code block — charcoal surface (cream in dark mode) */}
           <table
             role="presentation"
             width="100%"
             bgcolor="#303030"
-            background={darkBgUrl}
-            style={{ ...codeSection, backgroundImage: `url(${darkBgUrl})`, backgroundRepeat: 'repeat' }}
+            style={codeSection}
             className="bmo-dark-card"
           >
             <tbody>
@@ -192,21 +164,21 @@ export function AccessCodeEmail({
           </table>
 
           {/* CTA */}
-          <Section style={ctaSection}>
+          <Section style={ctaSection} className="bmo-bg">
             <Text style={ctaOr} className="bmo-charcoal-text">type this code into the bemellou app to unlock it</Text>
           </Section>
 
           {/* App Store link — no official badge asset embedded (Apple requires
               their unmodified artwork, not a recreation), so a plain styled
               link instead. Android is on the way, add its link here later. */}
-          <Section style={storeSection}>
+          <Section style={storeSection} className="bmo-bg">
             <Link href={APP_STORE_URL} style={storeLink}>
               find the bemellou app on the App Store →
             </Link>
           </Section>
 
           {/* Brand promise, italic accent */}
-          <Section style={quoteSection}>
+          <Section style={quoteSection} className="bmo-bg">
             <Text style={quote} className="bmo-quote bmo-charcoal-text">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
@@ -216,7 +188,7 @@ export function AccessCodeEmail({
               other classic "signature/quoted content" pattern mail
               clients key off, on top of the divider line already
               removed. */}
-          <Section style={footerSection}>
+          <Section style={footerSection} className="bmo-bg">
             {footer.split('\n').map((line, i) => (
               <Text key={i} style={footerStyle} className="bmo-charcoal-text">{line}</Text>
             ))}
@@ -283,7 +255,6 @@ const h1 = {
   fontSize: '28px',
   fontWeight: '700',
   color: '#303030',
-  backgroundColor: '#fffcf4',
   margin: '0 0 12px',
   letterSpacing: '-0.5px',
   lineHeight: '1.25',
@@ -292,7 +263,6 @@ const h1 = {
 const subtitle = {
   fontSize: '16px',
   color: '#303030',
-  backgroundColor: '#fffcf4',
   opacity: 0.75,
   lineHeight: '1.6',
   margin: '0',
@@ -301,7 +271,6 @@ const subtitle = {
 const peekWrap = {
   textAlign: 'center' as const,
   marginBottom: '-18px',
-  backgroundColor: '#fffcf4',
 }
 
 const peekImg = {
@@ -327,7 +296,6 @@ const codeLabel = {
   fontSize: '12px',
   fontWeight: '600',
   color: '#8ed1fc',
-  backgroundColor: '#303030',
   letterSpacing: '2px',
   textTransform: 'uppercase' as const,
   margin: '0 0 12px',
@@ -337,7 +305,6 @@ const codeBlock = {
   fontSize: '38px',
   fontWeight: '700',
   color: '#fffcf4',
-  backgroundColor: '#303030',
   letterSpacing: '6px',
   whiteSpace: 'nowrap' as const,
   fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
@@ -347,7 +314,6 @@ const codeBlock = {
 const codeHint = {
   fontSize: '13px',
   color: '#fffcf4',
-  backgroundColor: '#303030',
   opacity: 0.6,
   margin: '0',
 }
@@ -361,7 +327,6 @@ const ctaSection = {
 const ctaOr = {
   fontSize: '14px',
   color: '#303030',
-  backgroundColor: '#fffcf4',
   opacity: 0.75,
   margin: '0',
 }
@@ -396,7 +361,6 @@ const quote = {
   fontStyle: 'italic' as const,
   fontSize: '17px',
   color: '#303030',
-  backgroundColor: '#fffcf4',
   lineHeight: '1.6',
   margin: '0',
   wordWrap: 'break-word' as const,
@@ -410,7 +374,6 @@ const footerSection = {
 const footerStyle = {
   fontSize: '14px',
   color: '#303030',
-  backgroundColor: '#fffcf4',
   opacity: 0.75,
   lineHeight: '1.6',
   textAlign: 'center' as const,
