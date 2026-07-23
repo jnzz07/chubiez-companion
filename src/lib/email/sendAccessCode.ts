@@ -24,12 +24,16 @@ export async function sendAccessCodeEmail(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://bemellou-companion-production.up.railway.app'
   const logoUrl = `${appUrl}/brand/wordmark-sky.png`
   const peekUrl = `${appUrl}/brand/benny-vita-peek.png`
+  const creamBgUrl = `${appUrl}/brand/bg-cream.png`
+  const darkBgUrl = `${appUrl}/brand/bg-charcoal.png`
 
   const html = await render(
     AccessCodeEmail({
       code,
       logoUrl,
       peekUrl,
+      creamBgUrl,
+      darkBgUrl,
       heading: fillPlaceholders(template.heading, vars),
       intro: fillPlaceholders(template.intro, vars),
       footer: fillPlaceholders(template.footer, vars),

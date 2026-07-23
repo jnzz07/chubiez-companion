@@ -18,6 +18,8 @@ interface AccessCodeEmailProps {
   code: string
   logoUrl: string
   peekUrl: string
+  creamBgUrl: string
+  darkBgUrl: string
   /* Team-editable copy — placeholders already filled by sendAccessCodeEmail */
   heading: string
   intro: string
@@ -28,6 +30,8 @@ export function AccessCodeEmail({
   code,
   logoUrl,
   peekUrl,
+  creamBgUrl,
+  darkBgUrl,
   heading,
   intro,
   footer,
@@ -117,13 +121,24 @@ export function AccessCodeEmail({
       </Head>
       <Preview>{heading}</Preview>
       <Body style={main}>
-        {/* Full-bleed background wrapper: many mobile mail apps (Gmail app
-            especially) ignore the CSS background on <body> and fall back
-            to white, leaving a white frame around the Container on small
-            screens. A plain HTML bgcolor attribute on an outer 100%-width
-            table is honored far more consistently than any CSS approach,
-            so Soft Cream fills the entire viewport edge to edge. */}
-        <table role="presentation" width="100%" bgcolor="#fffcf4" style={outerTable} className="bmo-bg">
+        {/* Full-bleed background wrapper. Every dark-mode mechanism we've
+            hit (Gmail's own re-coloring, Android Force Dark, whatever the
+            iOS Gmail app does) targets DECLARED COLORS — bgcolor,
+            background-color, CSS color-scheme. None of them repaint pixels
+            inside a raster image. Using a solid-color tile PNG as the
+            actual background (via the legacy HTML `background` attribute,
+            which email clients still widely honor on tables) makes this
+            immune to color-based dark-mode reprocessing entirely,
+            regardless of client or OS. bgcolor + CSS stay as fallbacks
+            for the rare client that blocks images. */}
+        <table
+          role="presentation"
+          width="100%"
+          bgcolor="#fffcf4"
+          background={creamBgUrl}
+          style={{ ...outerTable, backgroundImage: `url(${creamBgUrl})`, backgroundRepeat: 'repeat' }}
+          className="bmo-bg"
+        >
           <tbody>
             <tr>
               <td align="center">
@@ -151,12 +166,30 @@ export function AccessCodeEmail({
             <Img src={peekUrl} width="185" alt="" style={peekImg} className="bmo-peek" />
           </Section>
 
-          {/* Code block — charcoal surface, sky blue label, cream code */}
-          <Section style={codeSection} className="bmo-code-section bmo-dark-card">
-            <Text style={codeLabel} className="bmo-sky-text">your access code</Text>
-            <Text style={codeBlock} className="bmo-code bmo-cream-text">{code}</Text>
-            <Text style={codeHint} className="bmo-cream-text">one-time use · never expires</Text>
-          </Section>
+          {/* Code block — charcoal surface, sky blue label, cream code.
+              Raw table with an image-based background (same reasoning as
+              the outer wrapper): this card's darkness must never flip to
+              light under any dark-mode engine, and a color value is
+              exactly what those engines target. A tiled charcoal PNG
+              can't be recolored the way a CSS background-color can. */}
+          <table
+            role="presentation"
+            width="100%"
+            bgcolor="#303030"
+            background={darkBgUrl}
+            style={{ ...codeSection, backgroundImage: `url(${darkBgUrl})`, backgroundRepeat: 'repeat' }}
+            className="bmo-dark-card"
+          >
+            <tbody>
+              <tr>
+                <td style={codeSectionInner} className="bmo-code-section">
+                  <Text style={codeLabel} className="bmo-sky-text">your access code</Text>
+                  <Text style={codeBlock} className="bmo-code bmo-cream-text">{code}</Text>
+                  <Text style={codeHint} className="bmo-cream-text">one-time use · never expires</Text>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
           {/* CTA */}
           <Section style={ctaSection}>
@@ -281,9 +314,12 @@ const peekImg = {
 const codeSection = {
   backgroundColor: '#303030',
   borderRadius: '16px',
-  padding: '32px 16px',
-  textAlign: 'center' as const,
   marginBottom: '32px',
+}
+
+const codeSectionInner = {
+  textAlign: 'center' as const,
+  padding: '32px 16px',
 }
 
 const codeLabel = {
