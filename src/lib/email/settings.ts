@@ -18,12 +18,12 @@ export const DEFAULT_TEMPLATE: EmailTemplate = {
   // send time in sendAccessCodeEmail.ts — keeps every subject unique
   // (prevents Gmail thread-grouping/collapsing) without ever showing the
   // actual redemption code in a subject line, notification, or lock screen.
-  subject: 'welcome to the family, your community is waiting for you inside',
-  heading: 'you took the first step.',
+  subject: 'Welcome to the family, your community is waiting for you inside',
+  heading: 'You took the first step.',
   intro:
-    "that's not nothing. here's your code to get into the app, where you and your mellou can have a safe space to be yourselves.",
+    "That's not nothing. Here's your code to get into the app, where you and your mellou can have a safe space to be yourselves.",
   footer:
-    'you bought a {{plush_name}}. we think that was a good call.\nquestions? reply to this email or hit us at support@bemellou.com\nthis code never expires, no rush.',
+    "You bought a mellou, we think that was a good call.\nQuestions? Reply to this email or hit us at support@bemellou.com\nThis code never expires, no rush.",
 }
 
 const SETTINGS_KEY = 'access_code_email'

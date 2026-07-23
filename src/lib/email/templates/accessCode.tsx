@@ -144,9 +144,9 @@ export function AccessCodeEmail({
             <tbody>
               <tr>
                 <td style={codeSectionInner} className="bmo-code-section">
-                  <Text style={codeLabel} className="bmo-sky-text">your access code</Text>
+                  <Text style={codeLabel} className="bmo-sky-text">Your access code</Text>
                   <Text style={codeBlock} className="bmo-code bmo-cream-text">{code}</Text>
-                  <Text style={codeHint} className="bmo-cream-text">one-time use · never expires</Text>
+                  <Text style={codeHint} className="bmo-cream-text">One-time use · never expires</Text>
                 </td>
               </tr>
             </tbody>
@@ -154,7 +154,7 @@ export function AccessCodeEmail({
 
           {/* CTA */}
           <Section style={ctaSection}>
-            <Text style={ctaOr} className="bmo-charcoal-text">type this code into the bemellou app to unlock it</Text>
+            <Text style={ctaOr} className="bmo-charcoal-text">Type this code into the bemellou app to unlock it</Text>
           </Section>
 
           {/* App Store link — no official badge asset embedded (Apple requires
@@ -162,13 +162,13 @@ export function AccessCodeEmail({
               link instead. Android is on the way, add its link here later. */}
           <Section style={storeSection}>
             <Link href={APP_STORE_URL} style={storeLink}>
-              find the bemellou app on the App Store →
+              Find the bemellou app on the App Store →
             </Link>
           </Section>
 
           {/* Brand promise, italic accent */}
           <Section style={quoteSection}>
-            <Text style={quote} className="bmo-quote bmo-charcoal-text">“we don’t fix you. we’re just here for you.”</Text>
+            <Text style={quote} className="bmo-quote bmo-charcoal-text">“We don’t fix you. We’re just here for you.”</Text>
           </Section>
 
           {/* Footer — deliberately the SAME size/weight as the rest of the
@@ -182,7 +182,7 @@ export function AccessCodeEmail({
               <Text key={i} style={footerStyle} className="bmo-charcoal-text">{line}</Text>
             ))}
             <Text style={footerStyle} className="bmo-charcoal-text">
-              bemellou · this code is for you only · please don&apos;t share it
+              bemellou · This code is for you only · Please don&apos;t share it
             </Text>
           </Section>
 
