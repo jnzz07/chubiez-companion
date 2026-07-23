@@ -80,26 +80,21 @@ export function AccessCodeEmail({
             .bmo-quote { font-size: 15px !important; }
             .bmo-peek { display: block !important; }
           }
-          /* After five attempts to force this email to stay on its light
-             colors regardless of device theme (meta tags, media-query
-             overrides, Gmail-web [data-ogsc] hooks, explicit color pairs,
-             image-based backgrounds), none reliably stopped the iOS Gmail
-             app's own dark-mode reprocessing. The correct approach instead
-             of continuing to fight it: author an intentional dark palette
-             using real brand colors, so whatever triggers dark mode shows
-             something designed on purpose. Page and card swap roles: page
-             becomes Charcoal, the code card becomes a cream "spotlight"
-             surface — both colors are already in the brand palette, so it
-             reads as intentional, not inverted-by-accident.
-             https://developers.google.com/gmail supports this pattern. */
+          /* No page background at all anymore — the page just uses
+             whatever native canvas the mail client shows (white in light
+             mode, its own dark surface in dark mode), so there's nothing
+             for any dark-mode engine to fight over. Only two elements
+             keep their own explicit color, because they need contrast
+             to read as a distinct design element regardless of what's
+             behind them: the code card and the CTA button. Text color
+             still needs to flip for legibility against whichever native
+             canvas is showing. */
           @media (prefers-color-scheme: dark) {
-            .bmo-bg { background-color: #303030 !important; }
             .bmo-charcoal-text { color: #fffcf4 !important; }
             .bmo-dark-card { background-color: #fffcf4 !important; }
             .bmo-cream-text { color: #303030 !important; }
             .bmo-sky-text { color: #0d7f6e !important; }
           }
-          [data-ogsc] .bmo-bg, [data-ogsb] .bmo-bg { background-color: #303030 !important; }
           [data-ogsc] .bmo-charcoal-text { color: #fffcf4 !important; }
           [data-ogsc] .bmo-dark-card, [data-ogsb] .bmo-dark-card { background-color: #fffcf4 !important; }
           [data-ogsc] .bmo-cream-text { color: #303030 !important; }
@@ -108,27 +103,21 @@ export function AccessCodeEmail({
       </Head>
       <Preview>{heading}</Preview>
       <Body style={main}>
-        {/* Full-bleed background wrapper — plain color (not an image),
-            since the dark-mode CSS below needs to actually repaint this. */}
-        <table
-          role="presentation"
-          width="100%"
-          bgcolor="#fffcf4"
-          style={outerTable}
-          className="bmo-bg"
-        >
+        {/* No background here at all — the page renders on whatever
+            native canvas the mail client provides. */}
+        <table role="presentation" width="100%" style={outerTable}>
           <tbody>
             <tr>
               <td align="center">
-                <Container style={container} className="bmo-container bmo-bg">
+                <Container style={container} className="bmo-container">
 
                   {/* Header — real Sky Blue wordmark on Soft Cream, per wordmark rule */}
-                  <Section style={header} className="bmo-bg">
+                  <Section style={header}>
                     <Img src={logoUrl} width="220" alt="bemellou" style={logo} className="bmo-logo" />
                   </Section>
 
           {/* Hero */}
-          <Section style={heroSection} className="bmo-bg">
+          <Section style={heroSection}>
             <Heading style={h1} className="bmo-h1 bmo-charcoal-text">{heading}</Heading>
             <Text style={subtitle} className="bmo-charcoal-text">{intro}</Text>
           </Section>
@@ -164,21 +153,21 @@ export function AccessCodeEmail({
           </table>
 
           {/* CTA */}
-          <Section style={ctaSection} className="bmo-bg">
+          <Section style={ctaSection}>
             <Text style={ctaOr} className="bmo-charcoal-text">type this code into the bemellou app to unlock it</Text>
           </Section>
 
           {/* App Store link — no official badge asset embedded (Apple requires
               their unmodified artwork, not a recreation), so a plain styled
               link instead. Android is on the way, add its link here later. */}
-          <Section style={storeSection} className="bmo-bg">
+          <Section style={storeSection}>
             <Link href={APP_STORE_URL} style={storeLink}>
               find the bemellou app on the App Store →
             </Link>
           </Section>
 
           {/* Brand promise, italic accent */}
-          <Section style={quoteSection} className="bmo-bg">
+          <Section style={quoteSection}>
             <Text style={quote} className="bmo-quote bmo-charcoal-text">“we don’t fix you. we’re just here for you.”</Text>
           </Section>
 
@@ -188,7 +177,7 @@ export function AccessCodeEmail({
               other classic "signature/quoted content" pattern mail
               clients key off, on top of the divider line already
               removed. */}
-          <Section style={footerSection} className="bmo-bg">
+          <Section style={footerSection}>
             {footer.split('\n').map((line, i) => (
               <Text key={i} style={footerStyle} className="bmo-charcoal-text">{line}</Text>
             ))}
@@ -213,12 +202,10 @@ export function AccessCodeEmail({
 // #0d7f6e (CTA only). Quicksand throughout — the only font used in this email.
 
 const main = {
-  backgroundColor: '#fffcf4',
   fontFamily: "'Quicksand', 'Trebuchet MS', sans-serif",
 }
 
 const outerTable = {
-  backgroundColor: '#fffcf4',
   margin: 0,
   padding: 0,
   borderCollapse: 'collapse' as const,
@@ -229,13 +216,11 @@ const container = {
   padding: '40px 20px',
   maxWidth: '520px',
   width: '100%',
-  backgroundColor: '#fffcf4',
 }
 
 const header = {
   textAlign: 'center' as const,
   marginBottom: '28px',
-  backgroundColor: '#fffcf4',
 }
 
 const logo = {
@@ -247,7 +232,6 @@ const logo = {
 const heroSection = {
   textAlign: 'center' as const,
   marginBottom: '32px',
-  backgroundColor: '#fffcf4',
 }
 
 const h1 = {
@@ -321,7 +305,6 @@ const codeHint = {
 const ctaSection = {
   textAlign: 'center' as const,
   marginBottom: '24px',
-  backgroundColor: '#fffcf4',
 }
 
 const ctaOr = {
@@ -334,7 +317,6 @@ const ctaOr = {
 const storeSection = {
   textAlign: 'center' as const,
   marginBottom: '28px',
-  backgroundColor: '#fffcf4',
 }
 
 const storeLink = {
@@ -353,7 +335,6 @@ const quoteSection = {
   textAlign: 'center' as const,
   marginBottom: '32px',
   padding: '0 16px',
-  backgroundColor: '#fffcf4',
 }
 
 const quote = {
@@ -368,7 +349,6 @@ const quote = {
 
 const footerSection = {
   marginTop: '24px',
-  backgroundColor: '#fffcf4',
 }
 
 const footerStyle = {
