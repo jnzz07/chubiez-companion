@@ -50,13 +50,16 @@ export async function POST(request: NextRequest) {
   // Only Vita and Benny (the actual plushies) get access codes. Pickpad is a
   // different product entirely — matched by name since that needs no Shopify
   // variant ID lookup and works immediately for any Pickpad variant/size.
+  // Spaces/casing are stripped before matching so "Pick Pad", "PickPad", and
+  // "pickpad" all match the same way regardless of how the product is named.
   const EXCLUDED_PRODUCT_KEYWORDS = ['pickpad']
+  const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '')
 
   // Process one code per UNIT purchased — a line item with quantity 3 means
   // three separate codes, not one. Each unit gets its own idempotency key
   // (orderId_variantId_unitIndex) so retries never double-send.
   for (const item of line_items) {
-    if (EXCLUDED_PRODUCT_KEYWORDS.some(kw => item.title.toLowerCase().includes(kw))) {
+    if (EXCLUDED_PRODUCT_KEYWORDS.some(kw => normalize(item.title).includes(kw))) {
       console.log(`[shopify-webhook] Skipping excluded product "${item.title}" for order ${orderId}`)
       continue
     }
@@ -64,7 +67,13 @@ export async function POST(request: NextRequest) {
     for (let unit = 0; unit < item.quantity; unit++) {
       const shopifyOrderId = `${orderId}_${item.variant_id}_${unit}`
 
-      // 3. Idempotency check — don't generate duplicates on webhook retries
+      // 3. Fast-path idempotency check — avoids claiming a pool code in the
+      // common case (this same delivery already ran, or a genuine retry).
+      // This alone is NOT the guarantee: two near-simultaneous deliveries
+      // could both pass this check before either INSERT commits. The real
+      // guarantee is the unique index on shopify_order_id (migration 008) —
+      // see the insertError handling below, which treats a unique-violation
+      // as an expected benign duplicate, not a failure.
       const { data: existing } = await supabase
         .from('access_codes')
         .select('id')
@@ -99,7 +108,16 @@ export async function POST(request: NextRequest) {
         })
 
       if (insertError) {
-        console.error(`[shopify-webhook] Failed to insert code for ${email}:`, insertError.message)
+        // 23505 = unique_violation — a concurrent delivery for the same unit
+        // won the race and already inserted it. This is the real guarantee
+        // against duplicates; treat it as an expected skip, not a failure.
+        // The pool code claimed above for this losing attempt stays marked
+        // used — a rare, acceptable cost for correctness under a genuine race.
+        if (insertError.code === '23505') {
+          console.log(`[shopify-webhook] Concurrent duplicate for ${shopifyOrderId} — skipping (unique constraint)`)
+        } else {
+          console.error(`[shopify-webhook] Failed to insert code for ${email}:`, insertError.message)
+        }
         // Return 200 to prevent Shopify from retrying — log the failure instead
         continue
       }
