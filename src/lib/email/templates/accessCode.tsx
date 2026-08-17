@@ -13,6 +13,7 @@ import {
 } from '@react-email/components'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/bemellou/id6776437223'
+const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.bemellou.app'
 
 interface AccessCodeEmailProps {
   code: string
@@ -163,6 +164,13 @@ export function AccessCodeEmail({
           <Section style={storeSection}>
             <Link href={APP_STORE_URL} style={storeLink}>
               Find the bemellou app on the App Store →
+            </Link>
+          </Section>
+
+          {/* Google Play link — same treatment as the App Store link above */}
+          <Section style={storeSection}>
+            <Link href={GOOGLE_PLAY_URL} style={storeLink}>
+              Find the bemellou app on Google Play →
             </Link>
           </Section>
 
