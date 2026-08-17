@@ -47,73 +47,87 @@ export async function POST(request: NextRequest) {
 
   const supabase = createAdminClient()
 
-  // Process one code per line item (one plushie = one code)
+  // Only Vita and Benny (the actual plushies) get access codes. Pickpad is a
+  // different product entirely — matched by name since that needs no Shopify
+  // variant ID lookup and works immediately for any Pickpad variant/size.
+  const EXCLUDED_PRODUCT_KEYWORDS = ['pickpad']
+
+  // Process one code per UNIT purchased — a line item with quantity 3 means
+  // three separate codes, not one. Each unit gets its own idempotency key
+  // (orderId_variantId_unitIndex) so retries never double-send.
   for (const item of line_items) {
-    const shopifyOrderId = `${orderId}_${item.variant_id}`
-
-    // 3. Idempotency check — don't generate duplicates on webhook retries
-    const { data: existing } = await supabase
-      .from('access_codes')
-      .select('id')
-      .eq('shopify_order_id', shopifyOrderId)
-      .single()
-
-    if (existing) {
-      console.log(`[shopify-webhook] Code already exists for order item ${shopifyOrderId} — skipping`)
+    if (EXCLUDED_PRODUCT_KEYWORDS.some(kw => item.title.toLowerCase().includes(kw))) {
+      console.log(`[shopify-webhook] Skipping excluded product "${item.title}" for order ${orderId}`)
       continue
     }
 
-    // 4. Claim a pre-made code from the pool (codes come from the Bemellou app —
-    // this service never invents its own). Empty pool → 500 so Shopify retries
-    // over the next 48h, giving time to import a fresh batch.
-    const code = await claimPoolCode(supabase)
-    if (!code) {
-      console.error(`[shopify-webhook] CODE POOL EMPTY — order ${shopifyOrderId} not fulfilled. Import more codes in /admin.`)
-      return NextResponse.json({ error: 'Code pool empty' }, { status: 500 })
-    }
-    const plushSlug = variantToPlushSlug(String(item.variant_id))
-    const plushName = item.title
+    for (let unit = 0; unit < item.quantity; unit++) {
+      const shopifyOrderId = `${orderId}_${item.variant_id}_${unit}`
 
-    // 5. Store in Supabase
-    const { error: insertError } = await supabase
-      .from('access_codes')
-      .insert({
-        email: email.toLowerCase(),
-        code,
-        plush_type_slug: plushSlug,
-        shopify_order_id: shopifyOrderId,
-        generated_by: 'shopify',
-      })
+      // 3. Idempotency check — don't generate duplicates on webhook retries
+      const { data: existing } = await supabase
+        .from('access_codes')
+        .select('id')
+        .eq('shopify_order_id', shopifyOrderId)
+        .single()
 
-    if (insertError) {
-      console.error(`[shopify-webhook] Failed to insert code for ${email}:`, insertError.message)
-      // Return 200 to prevent Shopify from retrying — log the failure instead
-      continue
-    }
-
-    // 6. Send email — unless auto-sending is paused (test-trial mode).
-    // Paused orders still get a code claimed + logged; send later via the
-    // panel's resend button, or flip AUTO_EMAILS_ENABLED to true on Railway.
-    if (process.env.AUTO_EMAILS_ENABLED === 'false') {
-      console.log(`[shopify-webhook] AUTO_EMAILS_ENABLED=false — code ${code} logged for ${email} but NOT emailed`)
-      continue
-    }
-
-    try {
-      const emailError = await sendAccessCodeEmail(supabase, { email, code, plushName })
-
-      if (emailError) {
-        console.error(`[shopify-webhook] Email failed for ${email}:`, emailError)
-      } else {
-        // Mark as sent
-        await supabase
-          .from('access_codes')
-          .update({ sent_at: new Date().toISOString() })
-          .eq('email', email.toLowerCase())
-          .eq('code', code)
+      if (existing) {
+        console.log(`[shopify-webhook] Code already exists for order item ${shopifyOrderId} — skipping`)
+        continue
       }
-    } catch (err) {
-      console.error(`[shopify-webhook] Unexpected email error for ${email}:`, err)
+
+      // 4. Claim a pre-made code from the pool (codes come from the Bemellou app —
+      // this service never invents its own). Empty pool → 500 so Shopify retries
+      // over the next 48h, giving time to import a fresh batch.
+      const code = await claimPoolCode(supabase)
+      if (!code) {
+        console.error(`[shopify-webhook] CODE POOL EMPTY — order ${shopifyOrderId} not fulfilled. Import more codes in /admin.`)
+        return NextResponse.json({ error: 'Code pool empty' }, { status: 500 })
+      }
+      const plushSlug = variantToPlushSlug(String(item.variant_id))
+      const plushName = item.title
+
+      // 5. Store in Supabase
+      const { error: insertError } = await supabase
+        .from('access_codes')
+        .insert({
+          email: email.toLowerCase(),
+          code,
+          plush_type_slug: plushSlug,
+          shopify_order_id: shopifyOrderId,
+          generated_by: 'shopify',
+        })
+
+      if (insertError) {
+        console.error(`[shopify-webhook] Failed to insert code for ${email}:`, insertError.message)
+        // Return 200 to prevent Shopify from retrying — log the failure instead
+        continue
+      }
+
+      // 6. Send email — unless auto-sending is paused (test-trial mode).
+      // Paused orders still get a code claimed + logged; send later via the
+      // panel's resend button, or flip AUTO_EMAILS_ENABLED to true on Railway.
+      if (process.env.AUTO_EMAILS_ENABLED === 'false') {
+        console.log(`[shopify-webhook] AUTO_EMAILS_ENABLED=false — code ${code} logged for ${email} but NOT emailed`)
+        continue
+      }
+
+      try {
+        const emailError = await sendAccessCodeEmail(supabase, { email, code, plushName })
+
+        if (emailError) {
+          console.error(`[shopify-webhook] Email failed for ${email}:`, emailError)
+        } else {
+          // Mark as sent
+          await supabase
+            .from('access_codes')
+            .update({ sent_at: new Date().toISOString() })
+            .eq('email', email.toLowerCase())
+            .eq('code', code)
+        }
+      } catch (err) {
+        console.error(`[shopify-webhook] Unexpected email error for ${email}:`, err)
+      }
     }
   }
 
